@@ -1,0 +1,38 @@
+
+# Stage 1: Build
+FROM oven/bun:alpine AS builder
+WORKDIR /app
+
+COPY bun.lock package.json ./
+RUN bun install --frozen-lockfile
+
+COPY . .
+RUN bun run build
+
+# Stage 2: Production runtime
+FROM oven/bun:alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/bun.lock ./
+RUN bun install --production --frozen-lockfile
+
+EXPOSE 8000
+CMD ["bun", "dist/server.js"]
+
+# Stage 3: Migration runner (needs drizzle-kit)
+FROM oven/bun:alpine AS migrator
+WORKDIR /app
+ENV NODE_ENV=development
+
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/drizzle ./drizzle
+COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/bun.lock ./
+
+RUN bun install --frozen-lockfile
+
+CMD ["bunx", "drizzle-kit", "migrate", "--config=drizzle.config.ts"]
