@@ -3,15 +3,6 @@ FROM oven/bun:alpine AS dev
 
 WORKDIR /app
 
-# Salin dependency file
-COPY bun.lock package.json ./
-
-# Instal dependency
-RUN bun install
-
-# Salin semua source code
-COPY . .
-
 # Expose port container
 EXPOSE 8000
 
