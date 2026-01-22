@@ -2,8 +2,13 @@ import { Context } from "hono";
 import { AppException } from "./exception/base.exception";
 import { ValidationException } from "./exception/validation.exception";
 import { response } from "./response";
+import { logger } from "../lib/logger/pino";
 
 export const errorHandler = async (err: Error, c: Context) => {
+  logger.error(
+    `${err.message} (${c.req.method} ${c.req.path} ${c.res.status})`,
+  );
+
   if (err instanceof ValidationException)
     return response.fail(
       c,
