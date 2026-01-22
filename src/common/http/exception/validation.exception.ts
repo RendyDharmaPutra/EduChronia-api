@@ -1,5 +1,11 @@
 import { AppException } from "./base.exception";
 
+/**
+ * Creates an instance of ValidationException.
+ *
+ * @param {string} message - The error message.
+ * @param {unknown} [details] - Additional details about the validation error.
+ */
 export class ValidationException extends AppException {
   constructor(
     message: string,
