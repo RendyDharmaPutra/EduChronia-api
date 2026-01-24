@@ -1,10 +1,20 @@
 # --- Development image ---
 FROM oven/bun:alpine AS dev
 
+# Working Directory
 WORKDIR /app
+
+# Copy dependency file (for cache layer)
+COPY package.json ./
+
+# Install dependency (dev deps included)
+RUN bun install
+
+# Copy source code
+COPY . .
 
 # Expose port container
 EXPOSE 8000
 
-# Jalankan Bun dengan hot reload
+# Run Bun dev server
 CMD ["bun", "run", "dev"]
