@@ -1,0 +1,13 @@
+{
+  "name": "EduChronia API",
+  "dockerComposeFile": "../../docker-compose.dev.yaml",
+  "service": "api",
+  "workspaceFolder": "/workspaces/EduChronia-api",
+  "customizations": {
+    "vscode": {
+      "extensions": ["oven.bun-vscode", "esbenp.prettier-vscode"]
+    }
+  },
+  "remoteUser": "root",
+  "postCreateCommand": "bun install",
+}
