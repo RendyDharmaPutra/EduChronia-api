@@ -18,8 +18,16 @@ const getEnv = (key: string) => {
  *
  * @property {string} PORT - The port number on which the application should listen.
  * @property {string} DATABASE_URL - The URL of the database.
+ * @property {string} BETTER_AUTH_BASE_URL - The base URL of the Better Auth server.
+ * @property {string} BETTER_AUTH_SECRET - The secret used by Better Auth.
+ * @property {string} GOOGLE_CLIENT_ID - The client ID of the Google provider.
+ * @property {string} GOOGLE_CLIENT_SECRET - The client secret of the Google provider.
  */
 export const env = {
   PORT: getEnv("PORT"),
   DATABASE_URL: getEnv("DATABASE_URL"),
+  BETTER_AUTH_BASE_URL: getEnv("BETTER_AUTH_BASE_URL"),
+  BETTER_AUTH_SECRET: getEnv("BETTER_AUTH_SECRET"),
+  GOOGLE_CLIENT_ID: getEnv("GOOGLE_CLIENT_ID"),
+  GOOGLE_CLIENT_SECRET: getEnv("GOOGLE_CLIENT_SECRET"),
 };
