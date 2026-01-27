@@ -16,6 +16,8 @@ const getEnv = (key: string) => {
 /**
  * An object that contains the values of the environment variables used in the application.
  *
+ * @property {string} HOST_WEB_BASE_URL - The base URL of the web application.
+ * @property {string} HOST_API_BASE_URL - The base URL of the API application.
  * @property {string} PORT - The port number on which the application should listen.
  * @property {string} DATABASE_URL - The URL of the database.
  * @property {string} BETTER_AUTH_BASE_URL - The base URL of the Better Auth server.
