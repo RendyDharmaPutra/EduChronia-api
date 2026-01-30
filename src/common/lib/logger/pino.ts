@@ -1,4 +1,5 @@
 import pino from "pino";
+import { env } from "../../config/env";
 
 /**
  * The logger object for logging messages.
@@ -8,12 +9,12 @@ import pino from "pino";
  * @type {Object}
  */
 export const logger = pino({
-  level: process.env.LOG_LEVEL ?? "info",
+  level: env.NODE_ENV === "development" ? "trace" : "info",
   base: {
     service: "educhronia-api",
   },
   transport:
-    process.env.NODE_ENV === "development"
+    env.NODE_ENV === "development"
       ? {
           target: "pino-pretty",
           options: {

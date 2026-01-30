@@ -26,6 +26,7 @@ const getEnv = (key: string) => {
  * @property {string} GOOGLE_CLIENT_SECRET - The client secret of the Google provider.
  */
 export const env = {
+  NODE_ENV: getEnv("NODE_ENV"),
   HOST_WEB_BASE_URL: getEnv("HOST_WEB_BASE_URL"),
   HOST_API_BASE_URL: getEnv("HOST_API_BASE_URL"),
   PORT: getEnv("PORT"),
