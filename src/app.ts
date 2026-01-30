@@ -5,6 +5,7 @@ import { httpLogger } from "./common/lib/logger/http-logger";
 import { auth } from "./common/lib/auth";
 import { cors } from "hono/cors";
 import { env } from "./common/config/env";
+import { requireAuth } from "./common/http/middleware/require-auth.middleware";
 
 /**
  * Create an instance of Hono application
@@ -27,30 +28,22 @@ export function createApp() {
 
   // Apply httpLogger middleware for logging HTTP requests
   app.use(httpLogger);
-
   // Apply errorHandler middleware for handling errors
   app.onError(errorHandler);
 
-  app.get("/", (c) => {
+  app.get("/", async (c) => {
     return response.success(c, { message: "Hello Hono!" });
   });
 
   app.on(["POST", "GET"], "/auth/*", (c) => {
-    console.log("AUTH HIT:", c.req.path);
     return auth.handler(c.req.raw);
   });
 
-  // Protected route example
-  app.get("/user", async (c) => {
-    const session = await auth.api.getSession({
-      headers: c.req.raw.headers,
+  // Example protected route
+  app.get("/user", requireAuth, async (c) => {
+    return response.success(c, {
+      message: "User authenticated",
     });
-
-    if (!session) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
-
-    return c.json({ user: session.user });
   });
 
   return app;
