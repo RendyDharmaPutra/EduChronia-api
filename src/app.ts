@@ -6,6 +6,7 @@ import { auth } from "./common/lib/auth";
 import { cors } from "hono/cors";
 import { env } from "./common/config/env";
 import { requireAuth } from "./common/http/middleware/require-auth.middleware";
+import { requestId } from "hono/request-id";
 
 /**
  * Create an instance of Hono application
@@ -26,6 +27,7 @@ export function createApp() {
     }),
   );
 
+  app.use(requestId());
   // Apply httpLogger middleware for logging HTTP requests
   app.use(httpLogger);
   // Apply errorHandler middleware for handling errors
