@@ -3,7 +3,7 @@ import { env } from "../../config/env";
 
 /**
  * The logger object for logging messages.
- * It sets the log level based on the LOG_LEVEL environment variable.
+ * It sets the log level based on the NODE_ENV environment variable.
  * If the environment is in development mode, it uses the pino-pretty transport for easier debugging.
  *
  * @type {Object}
