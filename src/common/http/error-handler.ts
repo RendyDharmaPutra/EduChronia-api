@@ -14,8 +14,10 @@ import { response } from "./response";
  * @param {Context} c - The current request context.
  */
 export const errorHandler = async (err: Error, c: Context) => {
+  const reqId = c.get("requestId");
+
   logger.error(
-    `${err.message} (${c.req.method} ${c.req.path} ${c.res.status})`,
+    `[rid=${reqId}] ${err.message} (${c.req.method} ${c.req.path} ${c.res.status})`,
   );
 
   if (err instanceof ValidationException)

@@ -11,6 +11,8 @@ import { logger } from "./pino";
  * @param {Next} next - The next middleware function in the chain.
  */
 export const httpLogger: MiddlewareHandler = async (c, next) => {
+  const reqId = c.get("requestId");
+
   // Get the start time of the request
   const start = Date.now();
   // Call the next middleware function
@@ -18,5 +20,7 @@ export const httpLogger: MiddlewareHandler = async (c, next) => {
   // Calculate the response time
   const ms = Date.now() - start;
 
-  logger.info(`[HTTP]: ${c.req.method} ${c.req.path} ${c.res.status} ${ms}ms`);
+  logger.info(
+    `[rid=${reqId}] ${c.req.method} ${c.req.path} ${c.res.status} ${ms}ms`,
+  );
 };
