@@ -7,6 +7,7 @@ import { cors } from "hono/cors";
 import { env } from "./common/config/env";
 import { requireAuth } from "./common/http/middleware/require-auth.middleware";
 import { requestId } from "hono/request-id";
+import { CourseModule } from "./modules/course/course.module";
 
 /**
  * Create an instance of Hono application
@@ -47,6 +48,8 @@ export function createApp() {
       message: "User authenticated",
     });
   });
+
+  app.route("/courses", CourseModule.routes);
 
   return app;
 }
