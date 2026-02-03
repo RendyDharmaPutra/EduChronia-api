@@ -6,10 +6,10 @@ import { AppException } from "./base.exception";
  * @param {string} message - The error message.
  * @param {unknown} [details] - Additional details about the validation error.
  */
-export class ValidationException extends AppException {
+export class ValidationException<T> extends AppException {
   constructor(
     message: string,
-    public readonly details?: unknown,
+    public readonly details?: T,
   ) {
     super(message, "VALIDATION_ERROR", 400);
   }
