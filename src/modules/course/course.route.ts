@@ -10,6 +10,7 @@ export function courseRoutes(controller: CourseController) {
   router.use(requireAuth);
 
   // implement routes
+  router.post("/", controller.create);
 
   return router;
 }
