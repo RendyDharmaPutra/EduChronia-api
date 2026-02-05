@@ -7,19 +7,28 @@ import { safeParseBody } from "../../common/http/safe-parse-body";
 export class CourseController {
   constructor(private readonly service: CourseService) {}
 
+  /**
+   * Handle course creation logic.
+   *
+   * This method is responsible for parsing the request body,
+   * injecting the userId from the context, and passing it to the service.
+   *
+   * @param {Context} c - The current request context.
+   * @return {Promise<unknown>} A promise that resolves to the created course.
+   * @throws {ValidationException} If the request body is invalid.
+   * @throws {AppException} If there is an error with the course creation process.
+   */
   create = async (c: Context) => {
-    //** TODO: Implemenet course creation logic
+    // Validate and parse the request body
     const body = await safeParseBody(
       c,
       createCourseDto,
       "Data kursus tidak valid",
     );
-    //    - Injecting userId from context into input then pass it to service
-    const bodyWithUserId = { ...body, userId: c.get("userId") };
-    const result = this.service.createCourse(bodyWithUserId);
-    //  3. Return success result from service -> created (201)
-    //    (error already throw in service)
-    // */
+    // Inject the userId from the context into the input
+    const course = { ...body, userId: c.get("userId") };
+    const result = await this.service.createCourse(course);
+
     return response.success(c, result);
   };
 }
