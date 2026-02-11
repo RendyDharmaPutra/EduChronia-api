@@ -12,7 +12,7 @@ export class CourseService {
       const meta = {
         page,
         limit,
-        length: data.length, // TODO: rename length prop to total
+        total: data.length,
       };
 
       return { data, meta };
