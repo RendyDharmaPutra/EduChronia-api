@@ -5,6 +5,14 @@ import { AppException } from "../../common/http/exception/base.exception";
 export class CourseService {
   constructor(private readonly repository: CourseRepository) {}
 
+  async getAllCourse(userId: string) {
+    try {
+      return await this.repository.findAllByUser(userId);
+    } catch (error: any) {
+      throw new Error(error.cause);
+    }
+  }
+
   /**
    * This method creates a new course by calling the `create` method of the
    * `CourseRepository` with the provided `course` data. It handles the result

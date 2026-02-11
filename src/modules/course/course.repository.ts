@@ -1,8 +1,20 @@
+import { eq } from "drizzle-orm";
 import { db } from "../../common/db/client";
 import { coursesTable } from "../../common/db/schema/course.schema";
 import { InsertCourse } from "./course.dto";
 
 export class CourseRepository {
+  async findAllByUser(userId: string) {
+    return await db
+      .select({
+        id: coursesTable.id,
+        name: coursesTable.name,
+        description: coursesTable.description,
+      })
+      .from(coursesTable)
+      .where(eq(coursesTable.userId, userId));
+  }
+
   /**
    * This method creates a new course by inserting it into the database and checking for
    * duplication of the name. It returns the created course.

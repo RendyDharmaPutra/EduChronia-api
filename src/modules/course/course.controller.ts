@@ -3,9 +3,25 @@ import type { Context } from "hono";
 import type { CourseService } from "./course.service";
 import { response } from "../../common/http/response";
 import { safeParseBody } from "../../common/http/safe-parse-body";
+import { logger } from "../../common/lib/logger/pino";
 
 export class CourseController {
   constructor(private readonly service: CourseService) {}
+
+  list = async (c: Context) => {
+    const userId = c.get("userId");
+    const result = await this.service.getAllCourse(userId); // TODO: Implement meta based on pagination
+
+    // ? Debug response value
+    logger.debug({ result }, "List course result");
+
+    // ? Dummy meta data
+    return response.success(c, result, {
+      page: 1,
+      limit: 10,
+      total: result.length,
+    });
+  };
 
   /**
    * Handle course creation logic.
