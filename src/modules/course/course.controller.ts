@@ -4,6 +4,7 @@ import type { CourseService } from "./course.service";
 import { response } from "../../common/http/response";
 import { safeParseBody } from "../../common/http/validation/safe-parse-body";
 import { logger } from "../../common/lib/logger/pino";
+import { safeParsePaginationQuery } from "../../common/http/validation/safe-parse-query";
 
 export class CourseController {
   constructor(private readonly service: CourseService) {}
@@ -11,9 +12,7 @@ export class CourseController {
   list = async (c: Context) => {
     const userId = c.get("userId");
 
-    // TODO: Implement validation for page and limit from query params
-    const page = Number(c.req.query("page") ?? 1);
-    const limit = Number(c.req.query("limit") ?? 10);
+    const { page, limit } = safeParsePaginationQuery(c);
     // ? Debug page & limit value based on query params
     logger.debug({ page, limit }, "List course query params");
 
