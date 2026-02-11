@@ -2,7 +2,7 @@ import { describe, it, expect, mock, beforeEach } from "bun:test";
 import { CourseController } from "./course.controller";
 import { CourseService } from "./course.service";
 import { response } from "../../common/http/response";
-import { safeParseBody } from "../../common/http/safe-parse-body";
+import { safeParseBody } from "../../common/http/validation/safe-parse-body";
 
 // Mock Service
 const mockService = {

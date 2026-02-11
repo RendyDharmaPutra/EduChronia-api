@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import z from "zod";
-import { ValidationException } from "./exception/validation.exception";
-import { logger } from "../lib/logger/pino";
+import { ValidationException } from "../exception/validation.exception";
+import { logger } from "../../lib/logger/pino";
 
 export const safeParseBody = async <T>(
   c: Context,

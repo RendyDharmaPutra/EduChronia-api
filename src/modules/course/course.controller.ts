@@ -2,7 +2,7 @@ import { createCourseDto } from "./course.dto";
 import type { Context } from "hono";
 import type { CourseService } from "./course.service";
 import { response } from "../../common/http/response";
-import { safeParseBody } from "../../common/http/safe-parse-body";
+import { safeParseBody } from "../../common/http/validation/safe-parse-body";
 import { logger } from "../../common/lib/logger/pino";
 
 export class CourseController {
