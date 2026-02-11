@@ -10,17 +10,19 @@ export class CourseController {
 
   list = async (c: Context) => {
     const userId = c.get("userId");
-    const result = await this.service.getAllCourse(userId); // TODO: Implement meta based on pagination
+
+    // TODO: Implement validation for page and limit from query params
+    const page = Number(c.req.query("page") ?? 1);
+    const limit = Number(c.req.query("limit") ?? 10);
+    // ? Debug page & limit value based on query params
+    logger.debug({ page, limit }, "List course query params");
+
+    const { data, meta } = await this.service.getAllCourse(userId, page, limit);
 
     // ? Debug response value
-    logger.debug({ result }, "List course result");
+    logger.debug({ data, meta }, "List course result");
 
-    // ? Dummy meta data
-    return response.success(c, result, {
-      page: 1,
-      limit: 10,
-      total: result.length,
-    });
+    return response.success(c, data, meta);
   };
 
   /**

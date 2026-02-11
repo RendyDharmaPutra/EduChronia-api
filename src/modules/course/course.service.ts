@@ -5,9 +5,17 @@ import { AppException } from "../../common/http/exception/base.exception";
 export class CourseService {
   constructor(private readonly repository: CourseRepository) {}
 
-  async getAllCourse(userId: string) {
+  async getAllCourse(userId: string, page: number, limit: number) {
     try {
-      return await this.repository.findAllByUser(userId);
+      const data = await this.repository.findAllByUser(userId, page, limit);
+
+      const meta = {
+        page,
+        limit,
+        length: data.length, // TODO: rename length prop to total
+      };
+
+      return { data, meta };
     } catch (error: any) {
       throw new Error(error.cause);
     }

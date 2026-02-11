@@ -4,7 +4,7 @@ import { coursesTable } from "../../common/db/schema/course.schema";
 import { InsertCourse } from "./course.dto";
 
 export class CourseRepository {
-  async findAllByUser(userId: string) {
+  async findAllByUser(userId: string, page: number, limit: number) {
     return await db
       .select({
         id: coursesTable.id,
@@ -12,7 +12,9 @@ export class CourseRepository {
         description: coursesTable.description,
       })
       .from(coursesTable)
-      .where(eq(coursesTable.userId, userId));
+      .where(eq(coursesTable.userId, userId))
+      .limit(limit)
+      .offset((page - 1) * limit); // TODO: Sort by "something???" with ASC as default
   }
 
   /**
