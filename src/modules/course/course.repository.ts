@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { db } from "../../common/db/client";
 import { coursesTable } from "../../common/db/schema/course.schema";
 import { InsertCourse } from "./course.dto";
@@ -15,6 +15,13 @@ export class CourseRepository {
       .where(eq(coursesTable.userId, userId))
       .limit(limit)
       .offset((page - 1) * limit); // TODO: Sort by "something???" with ASC as default
+  }
+
+  async countByUser(userId: string) {
+    return await db
+      .select({ count: count(coursesTable.id) })
+      .from(coursesTable)
+      .where(eq(coursesTable.userId, userId));
   }
 
   /**

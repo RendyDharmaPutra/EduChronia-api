@@ -7,12 +7,15 @@ export class CourseService {
 
   async getAllCourse(userId: string, page: number, limit: number) {
     try {
-      const data = await this.repository.findAllByUser(userId, page, limit);
+      const [data, total] = await Promise.all([
+        this.repository.findAllByUser(userId, page, limit),
+        this.repository.countByUser(userId),
+      ]);
 
       const pagination = {
         page,
         limit,
-        total: data.length,
+        total: total[0].count,
       };
 
       return { data, pagination };
