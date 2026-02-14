@@ -16,12 +16,16 @@ export class CourseController {
     // ? Debug page & limit value based on query params
     logger.debug({ page, limit }, "List course query params");
 
-    const { data, meta } = await this.service.getAllCourse(userId, page, limit);
+    const { data, pagination } = await this.service.getAllCourse(
+      userId,
+      page,
+      limit,
+    );
 
     // ? Debug response value
-    logger.debug({ data, meta }, "List course result");
+    logger.debug({ data, pagination }, "List course result");
 
-    return response.success(c, data, meta);
+    return response.success(c, data, { pagination });
   };
 
   /**

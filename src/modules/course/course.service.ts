@@ -9,13 +9,13 @@ export class CourseService {
     try {
       const data = await this.repository.findAllByUser(userId, page, limit);
 
-      const meta = {
+      const pagination = {
         page,
         limit,
         total: data.length,
       };
 
-      return { data, meta };
+      return { data, pagination };
     } catch (error: any) {
       throw new Error(error.cause);
     }
