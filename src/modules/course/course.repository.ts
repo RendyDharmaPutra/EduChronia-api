@@ -1,7 +1,8 @@
-import { count, eq } from "drizzle-orm";
+import { and, asc, count, eq } from "drizzle-orm";
 import { db } from "../../common/db/client";
 import { coursesTable } from "../../common/db/schema/course.schema";
 import { InsertCourse } from "./course.dto";
+import { logger } from "../../common/lib/logger/pino";
 
 export class CourseRepository {
   async findAllByUser(userId: string, page: number, limit: number) {
@@ -16,6 +17,21 @@ export class CourseRepository {
       .orderBy(asc(coursesTable.name))
       .limit(limit)
       .offset((page - 1) * limit); // TODO: Sort by "something???" with ASC as default
+  }
+
+  async findById(id: number, userId: string) {
+    // trace
+    logger.trace("Find by id repository");
+
+    // TODO: check is requested course is owned by the user or exists
+    return await db
+      .select({
+        id: coursesTable.id,
+        name: coursesTable.name,
+        description: coursesTable.description,
+      })
+      .from(coursesTable)
+      .where(and(eq(coursesTable.id, id), eq(coursesTable.userId, userId)));
   }
 
   async countByUser(userId: string) {

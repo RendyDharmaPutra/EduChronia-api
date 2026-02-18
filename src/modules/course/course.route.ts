@@ -12,6 +12,7 @@ export function courseRoutes(controller: CourseController) {
   // implement routes
   router.get("/", controller.list);
   router.post("/", controller.create);
+  router.get("/:id", controller.get);
 
   return router;
 }

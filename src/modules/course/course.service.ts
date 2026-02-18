@@ -1,6 +1,7 @@
 import type { CourseRepository } from "./course.repository";
 import type { InsertCourse } from "./course.dto";
 import { AppException } from "../../common/http/exception/base.exception";
+import { logger } from "../../common/lib/logger/pino";
 
 export class CourseService {
   constructor(private readonly repository: CourseRepository) {}
@@ -19,6 +20,18 @@ export class CourseService {
       };
 
       return { data, pagination };
+    } catch (error: any) {
+      throw new Error(error.cause);
+    }
+  }
+
+  async getCourseById(id: number, userId: string) {
+    // trace
+    logger.trace("Get course service");
+
+    try {
+      // TODO: check is requested course is owned by the user or exists
+      return await this.repository.findById(id, userId);
     } catch (error: any) {
       throw new Error(error.cause);
     }

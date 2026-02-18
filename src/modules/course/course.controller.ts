@@ -28,6 +28,19 @@ export class CourseController {
     return response.success(c, data, { pagination });
   };
 
+  get = async (c: Context) => {
+    // trace
+    logger.trace("Get course controller");
+
+    const userId = c.get("userId");
+    const id = c.req.param("id"); // TODO: Validate & parse id into number using zod with parse query pattern
+
+    const result = await this.service.getCourseById(Number(id), userId); // TODO: remove hard parsing id
+    logger.debug({ result }, "Course");
+
+    return response.success(c, result);
+  };
+
   /**
    * Handle course creation logic.
    *
