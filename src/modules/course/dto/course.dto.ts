@@ -1,6 +1,6 @@
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import z from "zod";
-import { coursesTable } from "../../common/db/schema/course.schema";
+import { coursesTable } from "../../../common/db/schema/course.schema";
 
 export const createCourseDto = z.object({
   name: z

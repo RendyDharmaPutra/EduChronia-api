@@ -1,5 +1,5 @@
 import type { CourseRepository } from "./course.repository";
-import type { InsertCourse } from "./course.dto";
+import type { InsertCourse } from "./dto/course.dto";
 import { AppException } from "../../common/http/exception/base.exception";
 import { logger } from "../../common/lib/logger/pino";
 

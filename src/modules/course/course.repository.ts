@@ -1,8 +1,8 @@
 import { and, asc, count, eq } from "drizzle-orm";
 import { db } from "../../common/db/client";
 import { coursesTable } from "../../common/db/schema/course.schema";
-import { InsertCourse } from "./course.dto";
 import { logger } from "../../common/lib/logger/pino";
+import type { InsertCourse } from "./dto/course.dto";
 
 export class CourseRepository {
   async findAllByUser(userId: string, page: number, limit: number) {

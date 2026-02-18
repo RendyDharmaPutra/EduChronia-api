@@ -1,4 +1,4 @@
-import { createCourseDto } from "./course.dto";
+import { createCourseDto } from "./dto/course.dto";
 import type { Context } from "hono";
 import type { CourseService } from "./course.service";
 import { response } from "../../common/http/response";
