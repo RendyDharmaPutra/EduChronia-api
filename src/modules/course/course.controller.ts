@@ -5,6 +5,8 @@ import { response } from "../../common/http/response";
 import { safeParseBody } from "../../common/http/validation/safe-parse-body";
 import { logger } from "../../common/lib/logger/pino";
 import { safeParsePaginationQuery } from "../../common/http/validation/safe-parse-query";
+import { getCourseParamSchema } from "./dto/get-course.dto";
+import { safeParseParams } from "../../common/http/validation/safe-parse-params";
 
 export class CourseController {
   constructor(private readonly service: CourseService) {}
@@ -33,9 +35,9 @@ export class CourseController {
     logger.trace("Get course controller");
 
     const userId = c.get("userId");
-    const id = c.req.param("id"); // TODO: Validate & parse id into number using zod with parse query pattern
+    const { id } = safeParseParams(c, getCourseParamSchema, "ID tidak valid");
 
-    const result = await this.service.getCourseById(Number(id), userId); // TODO: remove hard parsing id
+    const result = await this.service.getCourseById(id, userId);
     logger.debug({ result }, "Course");
 
     return response.success(c, result);
