@@ -30,9 +30,19 @@ export class CourseService {
     logger.trace("Get course service");
 
     try {
-      // TODO: check is requested course is owned by the user or exists
-      return await this.repository.findById(id, userId);
+      const course = await this.repository.findById(id, userId);
+
+      if (!course)
+        throw new AppException(
+          `Kursus tidak ditemukan`,
+          "COURSE_NOT_FOUND",
+          404,
+        );
+
+      return course;
     } catch (error: any) {
+      if (error instanceof AppException) throw error;
+
       throw new Error(error.cause);
     }
   }

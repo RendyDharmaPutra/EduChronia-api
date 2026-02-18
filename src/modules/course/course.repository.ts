@@ -23,7 +23,6 @@ export class CourseRepository {
     // trace
     logger.trace("Find by id repository");
 
-    // TODO: check is requested course is owned by the user or exists
     return await db
       .select({
         id: coursesTable.id,
@@ -31,7 +30,8 @@ export class CourseRepository {
         description: coursesTable.description,
       })
       .from(coursesTable)
-      .where(and(eq(coursesTable.id, id), eq(coursesTable.userId, userId)));
+      .where(and(eq(coursesTable.id, id), eq(coursesTable.userId, userId)))
+      .then((res) => res[0] ?? null);
   }
 
   async countByUser(userId: string) {
