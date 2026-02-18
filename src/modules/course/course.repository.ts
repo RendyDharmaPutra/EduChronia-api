@@ -13,6 +13,7 @@ export class CourseRepository {
       })
       .from(coursesTable)
       .where(eq(coursesTable.userId, userId))
+      .orderBy(asc(coursesTable.name))
       .limit(limit)
       .offset((page - 1) * limit); // TODO: Sort by "something???" with ASC as default
   }
