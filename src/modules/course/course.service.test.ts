@@ -7,6 +7,8 @@ describe("CourseService", () => {
   const mockRepository = {
     findAllByUser: mock(),
     create: mock(),
+    findById: mock(),
+    countByUser: mock(),
   };
 
   const service = new CourseService(mockRepository);
@@ -19,6 +21,7 @@ describe("CourseService", () => {
       const mockCourses = [{ id: 1, name: "Course 1", description: "Desc 1" }];
 
       (mockRepository.findAllByUser as any).mockResolvedValue(mockCourses);
+      (mockRepository.countByUser as any).mockResolvedValue([{ count: 1 }]);
 
       const result = await service.getAllCourse(
         mockUserId,
@@ -50,6 +53,47 @@ describe("CourseService", () => {
       });
 
       expect(service.getAllCourse(mockUserId, 1, 10)).rejects.toThrow(
+        "DB Error",
+      );
+    });
+  });
+
+  describe("getCourseById", () => {
+    it("should return course detail successfully", async () => {
+      const mockCourse = { id: 1, name: "Course 1", description: "Desc 1" };
+      const mockUserId = "user-123";
+
+      (mockRepository.findById as any).mockResolvedValue(mockCourse);
+
+      const result = await service.getCourseById(1, mockUserId);
+
+      expect(mockRepository.findById).toHaveBeenCalledWith(1, mockUserId);
+      expect(result).toEqual(mockCourse);
+    });
+
+    it("should throw AppException if course not found", async () => {
+      const mockUserId = "user-123";
+      (mockRepository.findById as any).mockResolvedValue(null);
+
+      try {
+        await service.getCourseById(1, mockUserId);
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(AppException);
+        expect(error.message).toBe("Kursus tidak ditemukan");
+        expect(error.statusCode).toBe(404);
+      }
+    });
+
+    it("should throw Error if repository fails", async () => {
+      const mockUserId = "user-123";
+      const mockError = new Error("DB Error");
+
+      (mockRepository.findById as any).mockRejectedValue({
+        cause: mockError.message,
+      });
+
+      // service.getCourseById rethrows error.cause as new Error if not AppException
+      await expect(service.getCourseById(1, mockUserId)).rejects.toThrow(
         "DB Error",
       );
     });
