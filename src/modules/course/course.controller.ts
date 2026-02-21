@@ -67,4 +67,16 @@ export class CourseController {
 
     return response.success(c, result);
   };
+
+  delete = async (c: Context) => {
+    // trace
+    logger.trace("Delete course controller");
+
+    const userId = c.get("userId");
+    const { id } = safeParseParams(c, getCourseParamSchema, "ID tidak valid");
+
+    await this.service.deleteCourseById(id, userId);
+
+    return response.success(c);
+  };
 }

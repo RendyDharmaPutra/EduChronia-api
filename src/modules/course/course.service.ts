@@ -96,4 +96,27 @@ export class CourseService {
       throw new Error(error.cause);
     }
   }
+
+  async deleteCourseById(id: number, userId: string) {
+    try {
+      const affected = await this.repository.deleteById(id, userId);
+      logger.debug({ affected }, "Course deleted"); // debug
+
+      if (!affected)
+        throw new AppException(
+          `Kursus tidak ditemukan`,
+          "COURSE_NOT_FOUND",
+          404,
+        );
+
+      // ? audit log
+      logger.info(`User (${userId}) deleted course [${id}]`);
+
+      return affected;
+    } catch (error: any) {
+      if (error instanceof AppException) throw error;
+
+      throw new Error(error.cause);
+    }
+  }
 }

@@ -13,6 +13,7 @@ export function courseRoutes(controller: CourseController) {
   router.get("/", controller.list);
   router.post("/", controller.create);
   router.get("/:id", controller.get);
+  router.delete("/:id", controller.delete);
 
   return router;
 }
