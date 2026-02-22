@@ -1,4 +1,4 @@
-import { createCourseDto } from "./dto/course.dto";
+import { createCourseDto, updateCourseDto } from "./dto/course.dto";
 import type { Context } from "hono";
 import type { CourseService } from "./course.service";
 import { response } from "../../common/http/response";
@@ -64,6 +64,25 @@ export class CourseController {
     // Inject the userId from the context into the input
     const course = { ...body, userId: c.get("userId") };
     const result = await this.service.createCourse(course);
+
+    return response.success(c, result);
+  };
+
+  update = async (c: Context) => {
+    // trace
+    logger.trace("Update course controller");
+
+    const userId = c.get("userId");
+    const { id } = safeParseParams(c, getCourseParamSchema, "ID tidak valid");
+
+    const body = await safeParseBody(
+      c,
+      updateCourseDto,
+      "Data kursus tidak valid",
+    );
+    // Inject the userId from the context into the input
+    const course = { ...body, userId };
+    const result = await this.service.updateCourseById(id, course, userId);
 
     return response.success(c, result);
   };

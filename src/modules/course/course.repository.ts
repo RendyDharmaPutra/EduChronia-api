@@ -57,6 +57,16 @@ export class CourseRepository {
     return (await db.insert(coursesTable).values(course).returning())[0];
   }
 
+  async updateById(id: number, course: InsertCourse, userId: string) {
+    return (
+      await db
+        .update(coursesTable)
+        .set(course)
+        .where(and(eq(coursesTable.id, id), eq(coursesTable.userId, userId)))
+        .returning()
+    )[0];
+  }
+
   async deleteById(id: number, userId: string) {
     const result = await db
       .delete(coursesTable)

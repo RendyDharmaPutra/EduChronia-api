@@ -2,6 +2,7 @@ import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import z from "zod";
 import { coursesTable } from "../../../common/db/schema/course.schema";
 
+// Rename to global course dto, for create and update feature
 export const createCourseDto = z.object({
   name: z
     .string("Format nama kursus tidak valid")
@@ -16,6 +17,9 @@ export const createCourseDto = z.object({
     .optional(),
 });
 
+export const updateCourseDto = createCourseDto;
+
 export type CreateCourseDto = z.infer<typeof createCourseDto>;
+export type UpdateCourseDto = z.infer<typeof createCourseDto>;
 export type InsertCourse = InferInsertModel<typeof coursesTable>;
 export type SelectCourse = InferSelectModel<typeof coursesTable>;

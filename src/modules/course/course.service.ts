@@ -1,5 +1,5 @@
 import type { CourseRepository } from "./course.repository";
-import type { InsertCourse } from "./dto/course.dto";
+import type { InsertCourse, UpdateCourseDto } from "./dto/course.dto";
 import { AppException } from "../../common/http/exception/base.exception";
 import { logger } from "../../common/lib/logger/pino";
 
@@ -84,6 +84,35 @@ export class CourseService {
     try {
       return await this.repository.create(course);
     } catch (error: any) {
+      // Handle duplication course entry
+      if (error.cause.code === "23505") {
+        throw new AppException(
+          `Kursus dengan nama ${course.name} sudah ada`,
+          "DUPLICATE_COURSE",
+          409,
+        );
+      }
+
+      throw new Error(error.cause);
+    }
+  }
+
+  async updateCourseById(id: number, course: InsertCourse, userId: string) {
+    try {
+      const result = await this.repository.updateById(id, course, userId);
+      logger.debug({ result }, "Course updated"); // debug
+
+      if (!result)
+        throw new AppException(
+          `Kursus tidak ditemukan`,
+          "COURSE_NOT_FOUND",
+          404,
+        );
+
+      return result;
+    } catch (error: any) {
+      if (error instanceof AppException) throw error;
+
       // Handle duplication course entry
       if (error.cause.code === "23505") {
         throw new AppException(
