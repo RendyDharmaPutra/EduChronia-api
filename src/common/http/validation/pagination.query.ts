@@ -1,6 +1,14 @@
 import { z } from "zod";
 
+/**
+ * Zod schema for validating and transforming pagination query parameters.
+ * Converts string inputs from URL queries into validated numbers with default values.
+ */
 export const paginationQuerySchema = z.object({
+  /**
+   * The page number to retrieve.
+   * @default 1
+   */
   page: z
     .string()
     .optional()
@@ -9,6 +17,11 @@ export const paginationQuerySchema = z.object({
       message: "Page harus berupa angka positif",
     }),
 
+  /**
+   * The number of items to return per page.
+   * @default 10
+   * @maximum 100
+   */
   limit: z
     .string()
     .optional()
@@ -18,4 +31,7 @@ export const paginationQuerySchema = z.object({
     }),
 });
 
+/**
+ * Type definition for pagination query parameters inferred from the schema.
+ */
 export type PaginationQuery = z.infer<typeof paginationQuerySchema>;
