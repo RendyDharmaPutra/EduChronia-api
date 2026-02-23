@@ -1,12 +1,15 @@
 import { AppException } from "./base.exception";
 
 /**
- * Creates an instance of ValidationException.
+ * Exception thrown when validation of input data fails.
  *
- * @param {string} message - The error message.
- * @param {unknown} [details] - Additional details about the validation error.
+ * @template T The shape of the validation error details.
  */
 export class ValidationException<T> extends AppException {
+  /**
+   * @param message A descriptive error message.
+   * @param details Additional context or specific field errors.
+   */
   constructor(
     message: string,
     public readonly details?: T,
