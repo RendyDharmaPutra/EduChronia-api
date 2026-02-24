@@ -1,12 +1,26 @@
 import type { CourseRepository } from "./course.repository";
-import type { InsertCourse, UpdateCourseDto } from "./dto/course.dto";
+import type {
+  InsertCourse,
+  SelectCourse,
+  UpdateCourseDto,
+} from "./dto/course.dto";
 import { AppException } from "../../common/http/exception/base.exception";
 import { logger } from "../../common/lib/logger/pino";
+import { PaginationQuery } from "../../common/http/validation/pagination.query";
 
 export class CourseService {
   constructor(private readonly repository: CourseRepository) {}
 
-  async getAllCourse(userId: string, page: number, limit: number) {
+  async getAllCourse(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<{
+    data: SelectCourse[];
+    pagination: PaginationQuery;
+  }> {
+    logger.trace("Get course list service");
+
     try {
       const [data, total] = await Promise.all([
         this.repository.findAllByUser(userId, page, limit),
@@ -16,8 +30,10 @@ export class CourseService {
       const pagination = {
         page,
         limit,
-        total: total[0].count,
+        total,
       };
+
+      logger.debug({ data, pagination }, "Course list retrieved");
 
       return { data, pagination };
     } catch (error: any) {
@@ -25,12 +41,12 @@ export class CourseService {
     }
   }
 
-  async getCourseById(id: number, userId: string) {
-    // trace
+  async getCourseById(id: number, userId: string): Promise<SelectCourse> {
     logger.trace("Get course service");
 
     try {
       const course = await this.repository.findById(id, userId);
+      logger.debug({ course }, "Course retrieved");
 
       if (!course)
         throw new AppException(
@@ -81,8 +97,13 @@ export class CourseService {
    * @throws {Error} - If there is a connection error, an `Error` is thrown.
    */
   async createCourse(course: InsertCourse): Promise<InsertCourse> {
+    logger.trace("Create course service");
+
     try {
-      return await this.repository.create(course);
+      const result = await this.repository.create(course);
+      logger.debug({ result }, "Course created");
+
+      return result;
     } catch (error: any) {
       // Handle duplication course entry
       if (error.cause.code === "23505") {
@@ -98,9 +119,11 @@ export class CourseService {
   }
 
   async updateCourseById(id: number, course: InsertCourse, userId: string) {
+    logger.trace("Update course service");
+
     try {
       const result = await this.repository.updateById(id, course, userId);
-      logger.debug({ result }, "Course updated"); // debug
+      logger.debug({ result }, "Course updated");
 
       if (!result)
         throw new AppException(
@@ -127,9 +150,11 @@ export class CourseService {
   }
 
   async deleteCourseById(id: number, userId: string) {
+    logger.trace("Delete course service");
+
     try {
       const affected = await this.repository.deleteById(id, userId);
-      logger.debug({ affected }, "Course deleted"); // debug
+      logger.debug({ affected }, "Course deleted");
 
       if (!affected)
         throw new AppException(
@@ -137,9 +162,6 @@ export class CourseService {
           "COURSE_NOT_FOUND",
           404,
         );
-
-      // ? audit log
-      logger.info(`User (${userId}) deleted course [${id}]`);
 
       return affected;
     } catch (error: any) {

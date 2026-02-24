@@ -6,31 +6,39 @@ import type { InsertCourse } from "./dto/course.dto";
 
 export class CourseRepository {
   async findAllByUser(userId: string, page: number, limit: number) {
-    return await db
+    logger.trace("Find all by user repository");
+
+    const result = await db
       .select()
       .from(coursesTable)
       .where(eq(coursesTable.userId, userId))
       .orderBy(asc(coursesTable.name))
       .limit(limit)
-      .offset((page - 1) * limit); // TODO: Sort by "something???" with ASC as default
+      .offset((page - 1) * limit);
+
+    return result;
   }
 
   async findById(id: number, userId: string) {
-    // trace
     logger.trace("Find by id repository");
 
-    return await db
+    const result = await db
       .select()
       .from(coursesTable)
-      .where(and(eq(coursesTable.id, id), eq(coursesTable.userId, userId)))
-      .then((res) => res[0] ?? null);
+      .where(and(eq(coursesTable.id, id), eq(coursesTable.userId, userId)));
+
+    return result[0] ?? null;
   }
 
   async countByUser(userId: string) {
-    return await db
+    logger.trace("Count by user repository");
+
+    const result = await db
       .select({ count: count(coursesTable.id) })
       .from(coursesTable)
       .where(eq(coursesTable.userId, userId));
+
+    return result[0].count;
   }
 
   /**
@@ -45,21 +53,30 @@ export class CourseRepository {
    * @throws {Error} - If there is a connection error, an `Error` is thrown.
    */
   async create(course: InsertCourse): Promise<InsertCourse> {
+    logger.trace("Create repository");
+
     // Insert & check duplication of name into database
-    return (await db.insert(coursesTable).values(course).returning())[0];
+    const result = await db.insert(coursesTable).values(course).returning();
+
+    return result[0] ?? null;
   }
 
   async updateById(id: number, course: InsertCourse, userId: string) {
-    return (
-      await db
-        .update(coursesTable)
-        .set(course)
-        .where(and(eq(coursesTable.id, id), eq(coursesTable.userId, userId)))
-        .returning()
-    )[0];
+    logger.trace("Update by id repository");
+
+    // Insert & check duplication of name into database
+    const result = await db
+      .update(coursesTable)
+      .set(course)
+      .where(and(eq(coursesTable.id, id), eq(coursesTable.userId, userId)))
+      .returning();
+
+    return result[0] ?? null;
   }
 
   async deleteById(id: number, userId: string) {
+    logger.trace("Delete by id repository");
+
     const result = await db
       .delete(coursesTable)
       .where(and(eq(coursesTable.id, id), eq(coursesTable.userId, userId)));

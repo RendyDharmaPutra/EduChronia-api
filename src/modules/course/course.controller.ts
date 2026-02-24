@@ -12,11 +12,10 @@ export class CourseController {
   constructor(private readonly service: CourseService) {}
 
   list = async (c: Context) => {
-    const userId = c.get("userId");
+    logger.trace("Get course list controller");
 
+    const userId = c.get("userId");
     const { page, limit } = safeParsePaginationQuery(c);
-    // ? Debug page & limit value based on query params
-    logger.debug({ page, limit }, "List course query params");
 
     const { data, pagination } = await this.service.getAllCourse(
       userId,
@@ -24,21 +23,16 @@ export class CourseController {
       limit,
     );
 
-    // ? Debug response value
-    logger.debug({ data, pagination }, "List course result");
-
     return response.success(c, data, { pagination });
   };
 
   get = async (c: Context) => {
-    // trace
     logger.trace("Get course controller");
 
     const userId = c.get("userId");
     const { id } = safeParseParams(c, getCourseParamSchema, "ID tidak valid");
 
     const result = await this.service.getCourseById(id, userId);
-    logger.debug({ result }, "Course");
 
     return response.success(c, result);
   };
@@ -55,46 +49,54 @@ export class CourseController {
    * @throws {AppException} If there is an error with the course creation process.
    */
   create = async (c: Context) => {
-    // Validate and parse the request body
+    logger.trace("Create course controller");
+
+    const userId = c.get("userId");
     const body = await safeParseBody(
       c,
       createCourseDto,
       "Data kursus tidak valid",
     );
-    // Inject the userId from the context into the input
-    const course = { ...body, userId: c.get("userId") };
+
+    const course = { ...body, userId };
     const result = await this.service.createCourse(course);
+
+    // ? audit log, do not remove
+    logger.info(`User (${userId}) created course [${result.name}]`);
 
     return response.success(c, result);
   };
 
   update = async (c: Context) => {
-    // trace
     logger.trace("Update course controller");
 
     const userId = c.get("userId");
     const { id } = safeParseParams(c, getCourseParamSchema, "ID tidak valid");
-
     const body = await safeParseBody(
       c,
       updateCourseDto,
       "Data kursus tidak valid",
     );
-    // Inject the userId from the context into the input
+
     const course = { ...body, userId };
     const result = await this.service.updateCourseById(id, course, userId);
+
+    // ? audit log, do not remove
+    logger.info(`User (${userId}) updated course [${id}]`);
 
     return response.success(c, result);
   };
 
   delete = async (c: Context) => {
-    // trace
     logger.trace("Delete course controller");
 
     const userId = c.get("userId");
     const { id } = safeParseParams(c, getCourseParamSchema, "ID tidak valid");
 
     await this.service.deleteCourseById(id, userId);
+
+    // ? audit log, do not remove
+    logger.info(`User (${userId}) deleted course [${id}]`);
 
     return response.success(c);
   };
