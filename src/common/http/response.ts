@@ -1,5 +1,6 @@
 import { Context } from "hono";
 import { ContentfulStatusCode } from "hono/utils/http-status";
+import { SuccessResponse, ErrorResponse } from "./response.types";
 
 /**
  * Object containing methods for handling HTTP responses:
@@ -21,7 +22,7 @@ export const response = {
     meta?: unknown,
     status: ContentfulStatusCode = 200,
   ) {
-    return c.json(
+    return c.json<SuccessResponse<T>>(
       {
         success: true,
         data,
@@ -50,7 +51,7 @@ export const response = {
     },
     status: ContentfulStatusCode = 500,
   ) {
-    return c.json(
+    return c.json<ErrorResponse>(
       {
         success: false,
         error,
