@@ -3,6 +3,7 @@ import type { InsertCourse, SelectCourse } from "./dto/course.dto";
 import { AppException } from "../../common/http/exception/base.exception";
 import { logger } from "../../common/lib/logger/pino";
 import { PaginationQuery } from "../../common/http/validation/pagination.query";
+import { mapToAppException } from "../../common/error/error-mapper";
 
 export class CourseService {
   /**
@@ -45,7 +46,7 @@ export class CourseService {
 
       return { data, pagination };
     } catch (error: any) {
-      throw new Error(error.cause);
+      mapToAppException(error);
     }
   }
 
@@ -73,9 +74,7 @@ export class CourseService {
 
       return course;
     } catch (error: any) {
-      if (error instanceof AppException) throw error;
-
-      throw new Error(error.cause);
+      mapToAppException(error);
     }
   }
 
@@ -95,7 +94,6 @@ export class CourseService {
 
       return result;
     } catch (error: any) {
-      // Handle duplication course entry (PostgreSQL unique_violation)
       if (error.cause.code === "23505") {
         throw new AppException(
           `Kursus dengan nama ${course.name} sudah ada`,
@@ -104,7 +102,7 @@ export class CourseService {
         );
       }
 
-      throw new Error(error.cause);
+      mapToAppException(error);
     }
   }
 
@@ -137,9 +135,6 @@ export class CourseService {
 
       return result;
     } catch (error: any) {
-      if (error instanceof AppException) throw error;
-
-      // Handle duplication course entry (PostgreSQL unique_violation)
       if (error.cause.code === "23505") {
         throw new AppException(
           `Kursus dengan nama ${course.name} sudah ada`,
@@ -148,7 +143,7 @@ export class CourseService {
         );
       }
 
-      throw new Error(error.cause);
+      mapToAppException(error);
     }
   }
 
@@ -176,9 +171,7 @@ export class CourseService {
 
       return affected;
     } catch (error: any) {
-      if (error instanceof AppException) throw error;
-
-      throw new Error(error.cause);
+      mapToAppException(error);
     }
   }
 }
