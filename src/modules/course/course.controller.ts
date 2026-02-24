@@ -9,8 +9,17 @@ import { getCourseParamSchema } from "./dto/get-course.dto";
 import { safeParseParams } from "../../common/http/validation/safe-parse-params";
 
 export class CourseController {
+  /**
+   * Initialize the CourseController with the CourseService.
+   * @param {CourseService} service - The service handling course operations.
+   */
   constructor(private readonly service: CourseService) {}
 
+  /**
+   * Retrieve a paginated list of courses for the authenticated user.
+   * @param {Context} c - The request context.
+   * @returns {Promise<Response>} A list of courses with pagination metadata.
+   */
   list = async (c: Context): Promise<Response> => {
     logger.trace("Get course list controller");
 
@@ -26,6 +35,11 @@ export class CourseController {
     return response.success(c, data, { pagination });
   };
 
+  /**
+   * Retrieve a specific course by its ID for the authenticated user.
+   * @param {Context} c - The request context.
+   * @returns {Promise<Response>} The requested course details.
+   */
   get = async (c: Context): Promise<Response> => {
     logger.trace("Get course controller");
 
@@ -45,8 +59,6 @@ export class CourseController {
    *
    * @param {Context} c - The current request context.
    * @return {Promise<Response>} A promise that resolves to the created course.
-   * @throws {ValidationException} If the request body is invalid.
-   * @throws {AppException} If there is an error with the course creation process.
    */
   create = async (c: Context): Promise<Response> => {
     logger.trace("Create course controller");
@@ -67,6 +79,11 @@ export class CourseController {
     return response.success(c, result);
   };
 
+  /**
+   * Update an existing course by its ID for the authenticated user.
+   * @param {Context} c - The request context.
+   * @returns {Promise<Response>} The updated course details.
+   */
   update = async (c: Context): Promise<Response> => {
     logger.trace("Update course controller");
 
@@ -87,6 +104,11 @@ export class CourseController {
     return response.success(c, result);
   };
 
+  /**
+   * Delete a specific course by its ID for the authenticated user.
+   * @param {Context} c - The request context.
+   * @returns {Promise<Response>} A success response indicating deletion.
+   */
   delete = async (c: Context): Promise<Response> => {
     logger.trace("Delete course controller");
 

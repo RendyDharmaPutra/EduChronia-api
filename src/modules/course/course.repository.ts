@@ -5,6 +5,14 @@ import { logger } from "../../common/lib/logger/pino";
 import type { InsertCourse, SelectCourse } from "./dto/course.dto";
 
 export class CourseRepository {
+  /**
+   * Retrieves a paginated list of courses for a specific user.
+   *
+   * @param {string} userId - The unique identifier of the user.
+   * @param {number} page - The page number to retrieve.
+   * @param {number} limit - The number of items per page.
+   * @returns {Promise<SelectCourse[]>} A promise that resolves to an array of courses.
+   */
   async findAllByUser(
     userId: string,
     page: number,
@@ -23,6 +31,13 @@ export class CourseRepository {
     return result;
   }
 
+  /**
+   * Finds a specific course by its ID and the user ID it belongs to.
+   *
+   * @param {number} id - The unique identifier of the course.
+   * @param {string} userId - The unique identifier of the user.
+   * @returns {Promise<SelectCourse | null>} A promise that resolves to the course if found, or null otherwise.
+   */
   async findById(id: number, userId: string): Promise<SelectCourse | null> {
     logger.trace("Find by id repository");
 
@@ -34,6 +49,12 @@ export class CourseRepository {
     return result[0] ?? null;
   }
 
+  /**
+   * Counts the total number of courses belonging to a specific user.
+   *
+   * @param {string} userId - The unique identifier of the user.
+   * @returns {Promise<number>} A promise that resolves to the total count of courses.
+   */
   async countByUser(userId: string): Promise<number> {
     logger.trace("Count by user repository");
 
@@ -46,25 +67,27 @@ export class CourseRepository {
   }
 
   /**
-   * This method creates a new course by inserting it into the database and checking for
-   * duplication of the name. It returns the created course.
+   * Creates a new course in the database.
    *
-   * @param {InsertCourse} course - The data of the course to be created.
-   * @return {Promise<InsertCourse>} - A promise that resolves to the created course.
-   * @throws {AppException} - If a course with the same name already exists, an
-   * `AppException` with the error type `DUPLICATE_COURSE` and the HTTP status
-   * code 409 is thrown.
-   * @throws {Error} - If there is a connection error, an `Error` is thrown.
+   * @param {InsertCourse} course - The course data to be inserted.
+   * @returns {Promise<SelectCourse>} A promise that resolves to the newly created course.
    */
   async create(course: InsertCourse): Promise<SelectCourse> {
     logger.trace("Create repository");
 
-    // Insert & check duplication of name into database
     const result = await db.insert(coursesTable).values(course).returning();
 
     return result[0];
   }
 
+  /**
+   * Updates an existing course by its ID and user ID.
+   *
+   * @param {number} id - The unique identifier of the course to update.
+   * @param {InsertCourse} course - The updated course data.
+   * @param {string} userId - The unique identifier of the user who owns the course.
+   * @returns {Promise<SelectCourse>} A promise that resolves to the updated course.
+   */
   async updateById(
     id: number,
     course: InsertCourse,
@@ -72,7 +95,6 @@ export class CourseRepository {
   ): Promise<SelectCourse> {
     logger.trace("Update by id repository");
 
-    // Insert & check duplication of name into database
     const result = await db
       .update(coursesTable)
       .set(course)
@@ -82,6 +104,13 @@ export class CourseRepository {
     return result[0];
   }
 
+  /**
+   * Deletes a course by its ID and user ID.
+   *
+   * @param {number} id - The unique identifier of the course to delete.
+   * @param {string} userId - The unique identifier of the user who owns the course.
+   * @returns {Promise<number | null>} A promise that resolves to the number of affected rows.
+   */
   async deleteById(id: number, userId: string): Promise<number | null> {
     logger.trace("Delete by id repository");
 

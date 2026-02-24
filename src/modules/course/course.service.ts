@@ -1,16 +1,24 @@
 import type { CourseRepository } from "./course.repository";
-import type {
-  InsertCourse,
-  SelectCourse,
-  UpdateCourseDto,
-} from "./dto/course.dto";
+import type { InsertCourse, SelectCourse } from "./dto/course.dto";
 import { AppException } from "../../common/http/exception/base.exception";
 import { logger } from "../../common/lib/logger/pino";
 import { PaginationQuery } from "../../common/http/validation/pagination.query";
 
 export class CourseService {
+  /**
+   * Initialize the CourseService with the CourseRepository.
+   * @param {CourseRepository} repository - The repository handling database operations.
+   */
   constructor(private readonly repository: CourseRepository) {}
 
+  /**
+   * Retrieves a paginated list of courses for a specific user.
+   *
+   * @param {string} userId - The unique identifier of the user.
+   * @param {number} page - The current page number for pagination.
+   * @param {number} limit - The maximum number of items to return per page.
+   * @returns {Promise<{ data: SelectCourse[]; pagination: PaginationQuery }>} A promise that resolves to an object containing the course data and pagination metadata.
+   */
   async getAllCourse(
     userId: string,
     page: number,
@@ -41,6 +49,14 @@ export class CourseService {
     }
   }
 
+  /**
+   * Retrieves a specific course by its ID and the user's ID.
+   *
+   * @param {number} id - The unique identifier of the course.
+   * @param {string} userId - The unique identifier of the user who owns the course.
+   * @returns {Promise<SelectCourse>} A promise that resolves to the course details.
+   * @throws {AppException} If the course is not found (404).
+   */
   async getCourseById(id: number, userId: string): Promise<SelectCourse> {
     logger.trace("Get course service");
 
@@ -64,37 +80,11 @@ export class CourseService {
   }
 
   /**
-   * This method creates a new course by calling the `create` method of the
-   * `CourseRepository` with the provided `course` data. It handles the result
-   * of the repository method and throws an appropriate error if there is one.
+   * Creates a new course.
    *
-   * @param {InsertCourse} course - The data of the course to be created.
-   * @return {Promise<InsertCourse>} - A promise that resolves to the created course.
-   * @throws {AppException} - If a course with the same name already exists, an
-   * `AppException` with the error type `DUPLICATE_COURSE` and the HTTP status
-   * code 409 is thrown.
-   * @throws {Error} - If there is a connection error, an `Error` is thrown.
-   */
-  /**
-   * This method creates a new course by calling the `create` method of the
-   * `CourseRepository` with the provided `course` data. It handles the result
-   * of the repository method and throws an appropriate error if there is one.
-   *
-   * Steps:
-   * 1. Call the `create` method of the `CourseRepository` with the provided `course` data.
-   * 2. Handle the result from the repository method:
-   *    - If successful, return the created course.
-   *    - If there is an error:
-   *      - If the error is a duplicate course error, throw an `AppException` with the
-   *        error type `DUPLICATE_COURSE` and the HTTP status code 409.
-   *      - If there is a connection error, throw a generic error.
-   *
-   * @param {InsertCourse} course - The data of the course to be created.
-   * @return {Promise<InsertCourse>} - A promise that resolves to the created course.
-   * @throws {AppException} - If a course with the same name already exists, an
-   * `AppException` with the error type `DUPLICATE_COURSE` and the HTTP status
-   * code 409 is thrown.
-   * @throws {Error} - If there is a connection error, an `Error` is thrown.
+   * @param {InsertCourse} course - The course data to be inserted.
+   * @returns {Promise<SelectCourse>} A promise that resolves to the newly created course.
+   * @throws {AppException} If a course with the same name already exists (409).
    */
   async createCourse(course: InsertCourse): Promise<SelectCourse> {
     logger.trace("Create course service");
@@ -105,7 +95,7 @@ export class CourseService {
 
       return result;
     } catch (error: any) {
-      // Handle duplication course entry
+      // Handle duplication course entry (PostgreSQL unique_violation)
       if (error.cause.code === "23505") {
         throw new AppException(
           `Kursus dengan nama ${course.name} sudah ada`,
@@ -118,6 +108,15 @@ export class CourseService {
     }
   }
 
+  /**
+   * Updates an existing course by its ID and the user's ID.
+   *
+   * @param {number} id - The unique identifier of the course to update.
+   * @param {InsertCourse} course - The updated course data.
+   * @param {string} userId - The unique identifier of the user who owns the course.
+   * @returns {Promise<SelectCourse>} A promise that resolves to the updated course details.
+   * @throws {AppException} If the course is not found (404) or if the updated name conflicts with another course (409).
+   */
   async updateCourseById(
     id: number,
     course: InsertCourse,
@@ -140,7 +139,7 @@ export class CourseService {
     } catch (error: any) {
       if (error instanceof AppException) throw error;
 
-      // Handle duplication course entry
+      // Handle duplication course entry (PostgreSQL unique_violation)
       if (error.cause.code === "23505") {
         throw new AppException(
           `Kursus dengan nama ${course.name} sudah ada`,
@@ -153,6 +152,14 @@ export class CourseService {
     }
   }
 
+  /**
+   * Deletes a course by its ID and the user's ID.
+   *
+   * @param {number} id - The unique identifier of the course to delete.
+   * @param {string} userId - The unique identifier of the user who owns the course.
+   * @returns {Promise<number>} A promise that resolves to the number of affected rows.
+   * @throws {AppException} If the course is not found (404).
+   */
   async deleteCourseById(id: number, userId: string): Promise<number> {
     logger.trace("Delete course service");
 
