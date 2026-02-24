@@ -58,7 +58,7 @@ export class CourseRepository {
     // Insert & check duplication of name into database
     const result = await db.insert(coursesTable).values(course).returning();
 
-    return result[0] ?? null;
+    return result[0];
   }
 
   async updateById(id: number, course: InsertCourse, userId: string) {
@@ -71,7 +71,7 @@ export class CourseRepository {
       .where(and(eq(coursesTable.id, id), eq(coursesTable.userId, userId)))
       .returning();
 
-    return result[0] ?? null;
+    return result[0];
   }
 
   async deleteById(id: number, userId: string) {
