@@ -7,11 +7,7 @@ import type { InsertCourse } from "./dto/course.dto";
 export class CourseRepository {
   async findAllByUser(userId: string, page: number, limit: number) {
     return await db
-      .select({
-        id: coursesTable.id,
-        name: coursesTable.name,
-        description: coursesTable.description,
-      })
+      .select()
       .from(coursesTable)
       .where(eq(coursesTable.userId, userId))
       .orderBy(asc(coursesTable.name))
@@ -24,11 +20,7 @@ export class CourseRepository {
     logger.trace("Find by id repository");
 
     return await db
-      .select({
-        id: coursesTable.id,
-        name: coursesTable.name,
-        description: coursesTable.description,
-      })
+      .select()
       .from(coursesTable)
       .where(and(eq(coursesTable.id, id), eq(coursesTable.userId, userId)))
       .then((res) => res[0] ?? null);
