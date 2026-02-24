@@ -96,7 +96,7 @@ export class CourseService {
    * code 409 is thrown.
    * @throws {Error} - If there is a connection error, an `Error` is thrown.
    */
-  async createCourse(course: InsertCourse): Promise<InsertCourse> {
+  async createCourse(course: InsertCourse): Promise<SelectCourse> {
     logger.trace("Create course service");
 
     try {
@@ -118,7 +118,11 @@ export class CourseService {
     }
   }
 
-  async updateCourseById(id: number, course: InsertCourse, userId: string) {
+  async updateCourseById(
+    id: number,
+    course: InsertCourse,
+    userId: string,
+  ): Promise<SelectCourse> {
     logger.trace("Update course service");
 
     try {
@@ -149,7 +153,7 @@ export class CourseService {
     }
   }
 
-  async deleteCourseById(id: number, userId: string) {
+  async deleteCourseById(id: number, userId: string): Promise<number> {
     logger.trace("Delete course service");
 
     try {

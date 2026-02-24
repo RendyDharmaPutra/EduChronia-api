@@ -2,10 +2,14 @@ import { and, asc, count, eq } from "drizzle-orm";
 import { db } from "../../common/db/client";
 import { coursesTable } from "../../common/db/schema/course.schema";
 import { logger } from "../../common/lib/logger/pino";
-import type { InsertCourse } from "./dto/course.dto";
+import type { InsertCourse, SelectCourse } from "./dto/course.dto";
 
 export class CourseRepository {
-  async findAllByUser(userId: string, page: number, limit: number) {
+  async findAllByUser(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<SelectCourse[]> {
     logger.trace("Find all by user repository");
 
     const result = await db
@@ -19,7 +23,7 @@ export class CourseRepository {
     return result;
   }
 
-  async findById(id: number, userId: string) {
+  async findById(id: number, userId: string): Promise<SelectCourse | null> {
     logger.trace("Find by id repository");
 
     const result = await db
@@ -30,7 +34,7 @@ export class CourseRepository {
     return result[0] ?? null;
   }
 
-  async countByUser(userId: string) {
+  async countByUser(userId: string): Promise<number> {
     logger.trace("Count by user repository");
 
     const result = await db
@@ -52,7 +56,7 @@ export class CourseRepository {
    * code 409 is thrown.
    * @throws {Error} - If there is a connection error, an `Error` is thrown.
    */
-  async create(course: InsertCourse): Promise<InsertCourse> {
+  async create(course: InsertCourse): Promise<SelectCourse> {
     logger.trace("Create repository");
 
     // Insert & check duplication of name into database
@@ -61,7 +65,11 @@ export class CourseRepository {
     return result[0];
   }
 
-  async updateById(id: number, course: InsertCourse, userId: string) {
+  async updateById(
+    id: number,
+    course: InsertCourse,
+    userId: string,
+  ): Promise<SelectCourse> {
     logger.trace("Update by id repository");
 
     // Insert & check duplication of name into database
@@ -74,7 +82,7 @@ export class CourseRepository {
     return result[0];
   }
 
-  async deleteById(id: number, userId: string) {
+  async deleteById(id: number, userId: string): Promise<number | null> {
     logger.trace("Delete by id repository");
 
     const result = await db

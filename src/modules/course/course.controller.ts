@@ -11,7 +11,7 @@ import { safeParseParams } from "../../common/http/validation/safe-parse-params"
 export class CourseController {
   constructor(private readonly service: CourseService) {}
 
-  list = async (c: Context) => {
+  list = async (c: Context): Promise<Response> => {
     logger.trace("Get course list controller");
 
     const userId = c.get("userId");
@@ -26,7 +26,7 @@ export class CourseController {
     return response.success(c, data, { pagination });
   };
 
-  get = async (c: Context) => {
+  get = async (c: Context): Promise<Response> => {
     logger.trace("Get course controller");
 
     const userId = c.get("userId");
@@ -44,11 +44,11 @@ export class CourseController {
    * injecting the userId from the context, and passing it to the service.
    *
    * @param {Context} c - The current request context.
-   * @return {Promise<unknown>} A promise that resolves to the created course.
+   * @return {Promise<Response>} A promise that resolves to the created course.
    * @throws {ValidationException} If the request body is invalid.
    * @throws {AppException} If there is an error with the course creation process.
    */
-  create = async (c: Context) => {
+  create = async (c: Context): Promise<Response> => {
     logger.trace("Create course controller");
 
     const userId = c.get("userId");
@@ -67,7 +67,7 @@ export class CourseController {
     return response.success(c, result);
   };
 
-  update = async (c: Context) => {
+  update = async (c: Context): Promise<Response> => {
     logger.trace("Update course controller");
 
     const userId = c.get("userId");
@@ -87,7 +87,7 @@ export class CourseController {
     return response.success(c, result);
   };
 
-  delete = async (c: Context) => {
+  delete = async (c: Context): Promise<Response> => {
     logger.trace("Delete course controller");
 
     const userId = c.get("userId");
