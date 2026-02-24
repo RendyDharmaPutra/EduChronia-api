@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import { createCourseDto } from "./course.dto";
+import { createCourseDto } from "./dto/course.dto";
 
 describe("CreateCourseDto", () => {
   it("should pass with valid data", () => {

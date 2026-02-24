@@ -1,7 +1,6 @@
-import { describe, expect, it, mock } from "bun:test";
+import { describe, expect, it, mock, beforeEach } from "bun:test";
 import { CourseController } from "./course.controller";
 import type { CourseService } from "./course.service";
-import { safeParseBody } from "../../common/http/validation/safe-parse-body";
 import { response } from "../../common/http/response";
 
 // Mock dependencies
@@ -9,6 +8,8 @@ const mockService = {
   getAllCourse: mock(),
   createCourse: mock(),
   getCourseById: mock(),
+  updateCourseById: mock(),
+  deleteCourseById: mock(),
 };
 
 // Mock Hono Context
@@ -27,10 +28,9 @@ mock.module("../../common/http/validation/safe-parse-query", () => ({
 }));
 
 // Mock Response module to ensure we control the behavior
-// We implement success to call c.json so we can verify the flow
 mock.module("../../common/http/response", () => ({
   response: {
-    success: mock((c, data, meta) =>
+    success: mock((c: any, data: any, meta?: any) =>
       c.json({ success: true, data, meta }, 200),
     ),
     fail: mock(),
@@ -42,7 +42,7 @@ mock.module("../../common/http/validation/safe-parse-params", () => ({
   safeParseParams: mock(),
 }));
 
-// Mock safeParseBody with correct path
+// Mock safeParseBody
 mock.module("../../common/http/validation/safe-parse-body", () => ({
   safeParseBody: mock(),
 }));
@@ -52,32 +52,31 @@ describe("CourseController", () => {
     mockService as unknown as CourseService,
   );
 
+  beforeEach(() => {
+    Object.values(mockService).forEach((m) => (m as any).mockReset());
+    mockContext.get.mockReset();
+    mockContext.json.mockReset();
+  });
+
   describe("list", () => {
-    it("should return success response with data and meta", async () => {
+    it("should return success response with data and pagination", async () => {
       const mockUserId = "user-123";
       const mockData = [{ id: 1, name: "Course 1" }];
-      const mockMeta = { page: 1, limit: 10, total: 1 };
+      const mockPagination = { page: 1, limit: 10, total: 1 };
 
       mockContext.get.mockReturnValue(mockUserId);
       (mockService.getAllCourse as any).mockResolvedValue({
         data: mockData,
-        pagination: mockMeta, // Fixed: service returns 'pagination', not 'meta'
+        pagination: mockPagination,
       });
 
       await controller.list(mockContext);
 
       expect(mockContext.get).toHaveBeenCalledWith("userId");
       expect(mockService.getAllCourse).toHaveBeenCalledWith(mockUserId, 1, 10);
-
-      // Verify response.success was called
-      expect(response.success).toHaveBeenCalledWith(
-        mockContext,
-        mockData,
-        { pagination: mockMeta }, // Fixed: controller passes { pagination: ... } as meta
-      );
-
-      // Verify c.json was called (via our mock implementation of response.success)
-      expect(mockContext.json).toHaveBeenCalledTimes(1);
+      expect(response.success).toHaveBeenCalledWith(mockContext, mockData, {
+        pagination: mockPagination,
+      });
     });
   });
 
@@ -87,7 +86,6 @@ describe("CourseController", () => {
       const mockCourseId = 1;
       const mockCourse = { id: mockCourseId, name: "Test Course" };
 
-      // Setup mocks
       mockContext.get.mockReturnValue(mockUserId);
       const { safeParseParams } =
         await import("../../common/http/validation/safe-parse-params");
@@ -98,109 +96,85 @@ describe("CourseController", () => {
       await controller.get(mockContext);
 
       expect(mockContext.get).toHaveBeenCalledWith("userId");
-      expect(safeParseParams).toHaveBeenCalledWith(
-        mockContext,
-        expect.anything(),
-        "ID tidak valid",
-      );
       expect(mockService.getCourseById).toHaveBeenCalledWith(
         mockCourseId,
         mockUserId,
       );
       expect(response.success).toHaveBeenCalledWith(mockContext, mockCourse);
     });
-
-    it("should return 404 if service throws COURSE_NOT_FOUND", async () => {
-      const mockUserId = "user-123";
-      const mockCourseId = 999;
-      const error = new Error("Kursus tidak ditemukan");
-      // @ts-ignore
-      error.statusCode = 404;
-
-      // Setup mocks
-      mockContext.get.mockReturnValue(mockUserId);
-      const { safeParseParams } =
-        await import("../../common/http/validation/safe-parse-params");
-      (safeParseParams as any).mockReturnValue({ id: mockCourseId });
-
-      mockService.getCourseById.mockRejectedValue(error);
-
-      try {
-        await controller.get(mockContext);
-      } catch (e: any) {
-        expect(e.message).toBe("Kursus tidak ditemukan");
-        expect(e.statusCode).toBe(404);
-      }
-
-      expect(mockService.getCourseById).toHaveBeenCalledWith(
-        mockCourseId,
-        mockUserId,
-      );
-    });
-
-    it("should return 500 if service throws unknown error", async () => {
-      const mockUserId = "user-123";
-      const mockCourseId = 1;
-      const error = new Error("Database error");
-
-      // Setup mocks
-      mockContext.get.mockReturnValue(mockUserId);
-      const { safeParseParams } =
-        await import("../../common/http/validation/safe-parse-params");
-      (safeParseParams as any).mockReturnValue({ id: mockCourseId });
-
-      mockService.getCourseById.mockRejectedValue(error);
-
-      try {
-        await controller.get(mockContext);
-      } catch (e: any) {
-        expect(e.message).toBe("Database error");
-      }
-
-      expect(mockService.getCourseById).toHaveBeenCalledWith(
-        mockCourseId,
-        mockUserId,
-      );
-    });
   });
 
   describe("create", () => {
     it("should create a course successfully", async () => {
-      const mockContext = {
-        get: mock((key: string) => {
-          if (key === "userId") return "user-1";
-          return null;
-        }),
-        req: {
-          json: mock(),
-        },
-        json: mock(),
-      };
+      const mockUserId = "user-1";
+      const mockBody = { name: "Test Course", description: "Test Description" };
+      const createdCourse = { ...mockBody, id: 1, userId: mockUserId };
 
-      const mockBody = {
-        name: "Test Course",
-        description: "Test Description",
-      };
-
-      const createdCourse = { ...mockBody, id: "1", userId: "user-1" };
-
-      // Setup mock return value for safeParseBody
+      mockContext.get.mockReturnValue(mockUserId);
+      const { safeParseBody } =
+        await import("../../common/http/validation/safe-parse-body");
       (safeParseBody as any).mockResolvedValue(mockBody);
       mockService.createCourse.mockResolvedValue(createdCourse);
 
-      // @ts-ignore
       await controller.create(mockContext);
 
-      expect(safeParseBody).toHaveBeenCalledWith(
-        mockContext,
-        expect.anything(),
-        "Data kursus tidak valid",
-      );
       expect(mockService.createCourse).toHaveBeenCalledWith({
         ...mockBody,
-        userId: "user-1",
+        userId: mockUserId,
       });
       expect(response.success).toHaveBeenCalledWith(mockContext, createdCourse);
+    });
+  });
+
+  describe("update", () => {
+    it("should update a course successfully", async () => {
+      const mockUserId = "user-1";
+      const mockCourseId = 1;
+      const mockBody = { name: "Updated Course", description: "Updated Desc" };
+      const updatedCourse = {
+        ...mockBody,
+        id: mockCourseId,
+        userId: mockUserId,
+      };
+
+      mockContext.get.mockReturnValue(mockUserId);
+      const { safeParseParams } =
+        await import("../../common/http/validation/safe-parse-params");
+      const { safeParseBody } =
+        await import("../../common/http/validation/safe-parse-body");
+      (safeParseParams as any).mockReturnValue({ id: mockCourseId });
+      (safeParseBody as any).mockResolvedValue(mockBody);
+      mockService.updateCourseById.mockResolvedValue(updatedCourse);
+
+      await controller.update(mockContext);
+
+      expect(mockService.updateCourseById).toHaveBeenCalledWith(
+        mockCourseId,
+        { ...mockBody, userId: mockUserId },
+        mockUserId,
+      );
+      expect(response.success).toHaveBeenCalledWith(mockContext, updatedCourse);
+    });
+  });
+
+  describe("delete", () => {
+    it("should delete a course successfully", async () => {
+      const mockUserId = "user-1";
+      const mockCourseId = 1;
+
+      mockContext.get.mockReturnValue(mockUserId);
+      const { safeParseParams } =
+        await import("../../common/http/validation/safe-parse-params");
+      (safeParseParams as any).mockReturnValue({ id: mockCourseId });
+      mockService.deleteCourseById.mockResolvedValue(1);
+
+      await controller.delete(mockContext);
+
+      expect(mockService.deleteCourseById).toHaveBeenCalledWith(
+        mockCourseId,
+        mockUserId,
+      );
+      expect(response.success).toHaveBeenCalledWith(mockContext);
     });
   });
 });

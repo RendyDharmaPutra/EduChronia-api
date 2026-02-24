@@ -2,6 +2,18 @@ import { describe, expect, it, mock } from "bun:test";
 import { CourseService } from "./course.service";
 import { AppException } from "../../common/http/exception/base.exception";
 
+// Mock logger to avoid potential hangs in tests
+mock.module("../../common/lib/logger/pino", () => ({
+  logger: {
+    trace: mock(),
+    debug: mock(),
+    info: mock(),
+    warn: mock(),
+    error: mock(),
+    fatal: mock(),
+  },
+}));
+
 describe("CourseService", () => {
   // Mock repository dependencies
   const mockRepository = {
@@ -9,19 +21,22 @@ describe("CourseService", () => {
     create: mock(),
     findById: mock(),
     countByUser: mock(),
+    updateById: mock(),
+    deleteById: mock(),
   };
 
   const service = new CourseService(mockRepository);
 
   describe("getAllCourse", () => {
-    it("should return data and meta on success", async () => {
+    it("should return data and pagination on success", async () => {
       const mockUserId = "user-123";
       const mockPage = 1;
       const mockLimit = 10;
       const mockCourses = [{ id: 1, name: "Course 1", description: "Desc 1" }];
+      const mockTotal = 5;
 
       (mockRepository.findAllByUser as any).mockResolvedValue(mockCourses);
-      (mockRepository.countByUser as any).mockResolvedValue([{ count: 1 }]);
+      (mockRepository.countByUser as any).mockResolvedValue(mockTotal);
 
       const result = await service.getAllCourse(
         mockUserId,
@@ -34,26 +49,27 @@ describe("CourseService", () => {
         mockPage,
         mockLimit,
       );
+      expect(mockRepository.countByUser).toHaveBeenCalledWith(mockUserId);
       expect(result).toEqual({
         data: mockCourses,
-        meta: {
+        pagination: {
           page: mockPage,
           limit: mockLimit,
-          total: mockCourses.length,
+          total: mockTotal,
         },
       });
     });
 
     it("should throw an error if repository fails", async () => {
       const mockUserId = "user-123";
-      const mockError = new Error("DB Error");
+      const mockErrorMessage = "DB Error";
 
       (mockRepository.findAllByUser as any).mockRejectedValue({
-        cause: mockError.message,
+        cause: mockErrorMessage,
       });
 
-      expect(service.getAllCourse(mockUserId, 1, 10)).rejects.toThrow(
-        "DB Error",
+      await expect(service.getAllCourse(mockUserId, 1, 10)).rejects.toThrow(
+        mockErrorMessage,
       );
     });
   });
@@ -86,15 +102,14 @@ describe("CourseService", () => {
 
     it("should throw Error if repository fails", async () => {
       const mockUserId = "user-123";
-      const mockError = new Error("DB Error");
+      const mockErrorMessage = "DB Error";
 
       (mockRepository.findById as any).mockRejectedValue({
-        cause: mockError.message,
+        cause: mockErrorMessage,
       });
 
-      // service.getCourseById rethrows error.cause as new Error if not AppException
       await expect(service.getCourseById(1, mockUserId)).rejects.toThrow(
-        "DB Error",
+        mockErrorMessage,
       );
     });
   });
@@ -106,7 +121,7 @@ describe("CourseService", () => {
         description: "Test Description",
         userId: "user-1",
       };
-      const createdCourse = { ...course, id: "1", createdAt: new Date() };
+      const createdCourse = { ...course, id: 1, createdAt: new Date() };
 
       mockRepository.create.mockResolvedValue(createdCourse);
 
