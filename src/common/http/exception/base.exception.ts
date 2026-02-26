@@ -1,32 +1,24 @@
 import { ContentfulStatusCode } from "hono/utils/http-status";
 
 /**
- * Class representing an application exception.
- *
- * This class is used to represent exceptions that occur during the execution of the application.
- * It extends the built-in `Error` class and adds additional properties to provide more information about the exception.
+ * Base class for application-specific exceptions.
+ * Extends the native Error class to include HTTP status codes and error types for structured error handling.
  */
 export class AppException extends Error {
   /**
-   * The type of the exception.
-   *
-   * This property represents the type of the exception and is used to categorize and handle different types of exceptions.
+   * A machine-readable string identifying the specific type of error.
    */
   public readonly type: string;
 
   /**
-   * The HTTP status code associated with the exception.
-   *
-   * This property represents the HTTP status code that should be returned in the response to indicate the type of the exception.
+   * The HTTP status code associated with this exception.
    */
   public readonly statusCode: ContentfulStatusCode;
 
   /**
-   * Creates an instance of AppException.
-   *
-   * @param {string} message - The error message.
-   * @param {string} type - The type of the exception.
-   * @param {ContentfulStatusCode} statusCode - The HTTP status code associated with the exception.
+   * @param message - A human-readable description of the error.
+   * @param type - A unique identifier for the error category.
+   * @param statusCode - The HTTP status code to be returned in the response.
    */
   constructor(message: string, type: string, statusCode: ContentfulStatusCode) {
     super(message);
