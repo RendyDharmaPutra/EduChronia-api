@@ -4,6 +4,8 @@ import { AppException } from "../../common/http/exception/base.exception";
 import { logger } from "../../common/lib/logger/pino";
 import { PaginationQuery } from "../../common/http/validation/pagination.query";
 import { mapToAppException } from "../../common/error/error-mapper";
+import { TaskModule } from "../task/task.module";
+import { SelectTask } from "../task/dto/task.dto";
 
 export class CourseService {
   /**
@@ -58,13 +60,14 @@ export class CourseService {
    * @returns {Promise<SelectCourse>} A promise that resolves to the course details.
    * @throws {AppException} If the course is not found (404).
    */
-  async getCourseById(id: number, userId: string): Promise<SelectCourse> {
+  async getCourseById(id: number, userId: string): Promise<{course: SelectCourse, tasks: SelectTask[]}> {
     logger.trace("Get course service");
 
     try {
       const course = await this.repository.findById(id, userId);
       logger.debug({ course }, "Course retrieved");
 
+      
       if (!course)
         throw new AppException(
           `Kursus tidak ditemukan`,
@@ -72,7 +75,10 @@ export class CourseService {
           404,
         );
 
-      return course;
+      const tasks = await TaskModule.repository.findByCourseId(id);
+      logger.debug({ tasks }, "Tasks retrieved");
+
+      return {course, tasks};
     } catch (error: any) {
       mapToAppException(error);
     }
