@@ -14,6 +14,16 @@ mock.module("../../common/lib/logger/pino", () => ({
   },
 }));
 
+mock.module("../task/task.module", () => {
+  return {
+    TaskModule: {
+      repository: {
+        findByCourseId: mock(),
+      },
+    },
+  };
+});
+
 describe("CourseService", () => {
   // Mock repository dependencies
   const mockRepository = {
@@ -64,9 +74,7 @@ describe("CourseService", () => {
       const mockUserId = "user-123";
       const mockErrorMessage = "DB Error";
 
-      (mockRepository.findAllByUser as any).mockRejectedValue({
-        cause: mockErrorMessage,
-      });
+      (mockRepository.findAllByUser as any).mockRejectedValue(new Error(mockErrorMessage));
 
       await expect(service.getAllCourse(mockUserId, 1, 10)).rejects.toThrow(
         mockErrorMessage,
@@ -77,14 +85,18 @@ describe("CourseService", () => {
   describe("getCourseById", () => {
     it("should return course detail successfully", async () => {
       const mockCourse = { id: 1, name: "Course 1", description: "Desc 1" };
+      const mockTasks = [{ id: 101, title: "Task 1", courseId: 1 }];
       const mockUserId = "user-123";
 
       (mockRepository.findById as any).mockResolvedValue(mockCourse);
+      const { TaskModule } = await import("../task/task.module");
+      (TaskModule.repository.findByCourseId as any).mockResolvedValue(mockTasks);
 
       const result = await service.getCourseById(1, mockUserId);
 
       expect(mockRepository.findById).toHaveBeenCalledWith(1, mockUserId);
-      expect(result).toEqual(mockCourse);
+      expect(TaskModule.repository.findByCourseId).toHaveBeenCalledWith(1);
+      expect(result).toEqual({ course: mockCourse, tasks: mockTasks });
     });
 
     it("should throw AppException if course not found", async () => {
@@ -104,9 +116,7 @@ describe("CourseService", () => {
       const mockUserId = "user-123";
       const mockErrorMessage = "DB Error";
 
-      (mockRepository.findById as any).mockRejectedValue({
-        cause: mockErrorMessage,
-      });
+      (mockRepository.findById as any).mockRejectedValue(new Error(mockErrorMessage));
 
       await expect(service.getCourseById(1, mockUserId)).rejects.toThrow(
         mockErrorMessage,
@@ -162,9 +172,9 @@ describe("CourseService", () => {
         userId: "user-1",
       };
 
-      const unknownError = new Error("Unknown error");
+      const unknownError = new Error("Some unknown error");
       // @ts-ignore
-      unknownError.cause = "Some unknown error";
+      unknownError.cause = { code: "unknown" };
 
       mockRepository.create.mockRejectedValue(unknownError);
 
