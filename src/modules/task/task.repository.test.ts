@@ -45,7 +45,8 @@ describe("TaskRepository", () => {
       const mockCourseId = 1;
       const mockTasks = [mockTask];
 
-      const whereMock = mock().mockResolvedValue(mockTasks);
+      const orderByMock = mock().mockResolvedValue(mockTasks);
+      const whereMock = mock().mockReturnValue({ orderBy: orderByMock });
       const fromMock = mock().mockReturnValue({ where: whereMock });
 
       mockDb.select.mockReturnValue({ from: fromMock });
@@ -61,7 +62,8 @@ describe("TaskRepository", () => {
     it("should return empty array if no tasks found", async () => {
       const mockCourseId = 999;
 
-      const whereMock = mock().mockResolvedValue([]);
+      const orderByMock = mock().mockResolvedValue([]);
+      const whereMock = mock().mockReturnValue({ orderBy: orderByMock });
       const fromMock = mock().mockReturnValue({ where: whereMock });
 
       mockDb.select.mockReturnValue({ from: fromMock });
