@@ -4,7 +4,6 @@ import { AppException } from "../../common/http/exception/base.exception";
 import { logger } from "../../common/lib/logger/pino";
 import { PaginationQuery } from "../../common/http/validation/pagination.query";
 import { mapToAppException } from "../../common/error/error-mapper";
-import { TaskModule } from "../task/task.module";
 import { SelectTask } from "../task/dto/task.dto";
 import { TaskRepository } from "../task/task.repository";
 
