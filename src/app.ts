@@ -8,6 +8,7 @@ import { env } from "./common/config/env";
 import { requireAuth } from "./common/http/middleware/require-auth.middleware";
 import { requestId } from "hono/request-id";
 import { CourseModule } from "./modules/course/course.module";
+import { TaskModule } from "./modules/task/task.module";
 
 /**
  * Create an instance of Hono application
@@ -50,6 +51,7 @@ export function createApp() {
   });
 
   app.route("/courses", CourseModule.routes);
+  app.route("/tasks", TaskModule.routes);
 
   return app;
 }
