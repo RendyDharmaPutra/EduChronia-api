@@ -14,7 +14,7 @@ export const createTaskDto = z.object({
     .max(255, "Deskripsi harus maksimal 255 karakter")
     .trim()
     .optional(),
-  deadline: z.date("Format tanggal tidak valid").nonoptional(),
+  deadline: z.coerce.date("Format tanggal tidak valid").nonoptional(),
   isCompleted: z.boolean().optional(),
   courseId: z.number("Format ID kursus tidak valid").nonoptional(),
 });
