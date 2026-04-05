@@ -22,6 +22,18 @@ mock.module("../../common/db/client", () => ({
   db: mockDb,
 }));
 
+// Mock logger
+mock.module("../../common/lib/logger/pino", () => ({
+  logger: {
+    trace: mock(),
+    debug: mock(),
+    info: mock(),
+    warn: mock(),
+    error: mock(),
+    fatal: mock(),
+  },
+}));
+
 describe("CourseRepository", () => {
   let CourseRepository: any;
   let repository: any;
