@@ -2,6 +2,7 @@ import { db } from "../../common/db/client";
 import { tasksTable } from "../../common/db/schema/task.schema";
 import { eq, sql } from "drizzle-orm";
 import { logger } from "../../common/lib/logger/pino";
+import { InsertTask, SelectTask } from "./dto/task.dto";
 
 export class TaskRepository {
   async findByCourseId(courseId: number) {
@@ -24,5 +25,13 @@ export class TaskRepository {
       );
 
     return result;
+  }
+
+  async create(task: InsertTask): Promise<SelectTask> {
+    logger.trace("Create task repository");
+
+    const result = await db.insert(tasksTable).values(task).returning();
+
+    return result[0];
   }
 }
