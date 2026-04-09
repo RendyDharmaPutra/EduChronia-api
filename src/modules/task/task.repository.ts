@@ -34,4 +34,16 @@ export class TaskRepository {
 
     return result[0];
   }
+
+  async updateById(id: number, task: InsertTask): Promise<SelectTask> {
+    logger.trace("Update task by id repository");
+
+    const result = await db
+      .update(tasksTable)
+      .set(task)
+      .where(eq(tasksTable.id, id))
+      .returning();
+
+    return result[0];
+  }
 }

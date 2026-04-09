@@ -8,6 +8,7 @@ export function taskRoutes(controller: TaskController) {
   router.use(requireAuth);
 
   router.post("/", controller.create);
+  router.put("/:id", controller.update);
 
   return router;
 }
