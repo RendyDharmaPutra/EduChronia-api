@@ -14,7 +14,11 @@ export class TaskController {
     logger.trace("Create task controller");
 
     const userId = c.get("userId");
-    const body = await safeParseBody(c, createTaskDto, "Data task tidak valid");
+    const body = await safeParseBody(
+      c,
+      createTaskDto,
+      "Data tugas tidak valid",
+    );
 
     const task = { ...body, userId };
     const result = await this.service.createTask(task);
