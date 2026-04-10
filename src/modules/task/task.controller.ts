@@ -42,4 +42,14 @@ export class TaskController {
 
     return response.success(c, result);
   };
+
+  delete = async (c: Context): Promise<Response> => {
+    logger.trace("Delete task controller");
+
+    const { id } = safeParseParams(c, idParamSchema, "ID tidak valid");
+
+    await this.service.deleteTaskById(id);
+
+    return response.success(c);
+  };
 }

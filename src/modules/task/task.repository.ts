@@ -46,4 +46,12 @@ export class TaskRepository {
 
     return result[0];
   }
+
+  async deleteById(id: number): Promise<number | null> {
+    logger.trace("Delete task by id repository");
+
+    const result = await db.delete(tasksTable).where(eq(tasksTable.id, id));
+
+    return result.rowCount;
+  }
 }

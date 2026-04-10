@@ -35,4 +35,20 @@ export class TaskService {
       mapToAppException(error);
     }
   }
+
+  async deleteTaskById(id: number): Promise<number> {
+    logger.trace("Delete task service");
+
+    try {
+      const affected = await this.repository.deleteById(id);
+      logger.debug({ affected }, "Task deleted");
+
+      if (!affected)
+        throw new AppException(`Tugas tidak ditemukan`, "TASK_NOT_FOUND", 404);
+
+      return affected;
+    } catch (error: any) {
+      mapToAppException(error);
+    }
+  }
 }
