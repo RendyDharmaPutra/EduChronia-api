@@ -19,7 +19,7 @@ export const createTaskDto = z.object({
   courseId: z.number("Format ID kursus tidak valid").nonoptional(),
 });
 
-export const updateTaskDto = createTaskDto;
+export const updateTaskDto = createTaskDto.partial();
 
 export type CreateTaskDto = z.infer<typeof createTaskDto>;
 export type UpdateTaskDto = z.infer<typeof updateTaskDto>;

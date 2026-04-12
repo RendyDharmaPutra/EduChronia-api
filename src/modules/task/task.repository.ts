@@ -2,7 +2,7 @@ import { db } from "../../common/db/client";
 import { tasksTable } from "../../common/db/schema/task.schema";
 import { eq, sql } from "drizzle-orm";
 import { logger } from "../../common/lib/logger/pino";
-import { InsertTask, SelectTask } from "./dto/task.dto";
+import { InsertTask, SelectTask, UpdateTaskDto } from "./dto/task.dto";
 
 export class TaskRepository {
   async findByCourseId(courseId: number) {
@@ -35,7 +35,7 @@ export class TaskRepository {
     return result[0];
   }
 
-  async updateById(id: number, task: InsertTask): Promise<SelectTask> {
+  async updateById(id: number, task: UpdateTaskDto): Promise<SelectTask> {
     logger.trace("Update task by id repository");
 
     const result = await db

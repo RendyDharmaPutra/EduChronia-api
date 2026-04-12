@@ -1,7 +1,7 @@
 import { mapToAppException } from "../../common/error/error-mapper";
 import { AppException } from "../../common/http/exception/base.exception";
 import { logger } from "../../common/lib/logger/pino";
-import { InsertTask, SelectTask } from "./dto/task.dto";
+import { InsertTask, SelectTask, UpdateTaskDto } from "./dto/task.dto";
 import type { TaskRepository } from "./task.repository";
 
 export class TaskService {
@@ -20,7 +20,7 @@ export class TaskService {
     }
   }
 
-  async updateTaskById(id: number, task: InsertTask): Promise<SelectTask> {
+  async updateTaskById(id: number, task: UpdateTaskDto): Promise<SelectTask> {
     logger.trace("Update task service");
 
     try {
