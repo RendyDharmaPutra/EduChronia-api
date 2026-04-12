@@ -9,6 +9,8 @@ export function taskRoutes(controller: TaskController) {
 
   router.post("/", controller.create);
   router.put("/:id", controller.update);
+  router.patch("/:id/complete", controller.setComplete);
+  router.patch("/:id/uncomplete", controller.setUnComplete);
   router.delete("/:id", controller.delete);
 
   return router;

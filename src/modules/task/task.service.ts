@@ -51,4 +51,22 @@ export class TaskService {
       mapToAppException(error);
     }
   }
+
+  async setCompleteById(id: number, status: boolean): Promise<SelectTask> {
+    logger.trace("Set complete task service");
+
+    try {
+      const result = await this.repository.updateById(id, {
+        isCompleted: status,
+      });
+      logger.debug({ result }, "Toggle task completion");
+
+      if (!result)
+        throw new AppException(`Tugas tidak ditemukan`, "TASK_NOT_FOUND", 404);
+
+      return result;
+    } catch (error: any) {
+      mapToAppException(error);
+    }
+  }
 }

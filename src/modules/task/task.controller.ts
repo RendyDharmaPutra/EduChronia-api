@@ -52,4 +52,24 @@ export class TaskController {
 
     return response.success(c);
   };
+
+  setComplete = async (c: Context): Promise<Response> => {
+    logger.trace("Set complete task controller");
+
+    const { id } = safeParseParams(c, idParamSchema, "ID tidak valid");
+
+    const result = await this.service.setCompleteById(id, true);
+
+    return response.success(c, result);
+  };
+
+  setUnComplete = async (c: Context): Promise<Response> => {
+    logger.trace("Set uncomplete task controller");
+
+    const { id } = safeParseParams(c, idParamSchema, "ID tidak valid");
+
+    const result = await this.service.setCompleteById(id, false);
+
+    return response.success(c, result);
+  };
 }
