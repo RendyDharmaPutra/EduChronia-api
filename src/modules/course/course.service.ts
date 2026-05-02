@@ -4,13 +4,18 @@ import { AppException } from "../../common/http/exception/base.exception";
 import { logger } from "../../common/lib/logger/pino";
 import { PaginationQuery } from "../../common/http/validation/pagination.query";
 import { mapToAppException } from "../../common/error/error-mapper";
+import { SelectTask } from "../task/dto/task.dto";
+import { TaskRepository } from "../task/task.repository";
 
 export class CourseService {
   /**
    * Initialize the CourseService with the CourseRepository.
-   * @param {CourseRepository} repository - The repository handling database operations.
+   * @param {CourseRepository} courseRepository - The courseRepository handling database operations.
    */
-  constructor(private readonly repository: CourseRepository) {}
+  constructor(
+    private readonly courseRepository: CourseRepository,
+    private readonly taskRepository: TaskRepository,
+  ) {}
 
   /**
    * Retrieves a paginated list of courses for a specific user.
@@ -32,8 +37,8 @@ export class CourseService {
 
     try {
       const [data, total] = await Promise.all([
-        this.repository.findAllByUser(userId, page, limit),
-        this.repository.countByUser(userId),
+        this.courseRepository.findAllByUser(userId, page, limit),
+        this.courseRepository.countByUser(userId),
       ]);
 
       const pagination = {
@@ -55,14 +60,17 @@ export class CourseService {
    *
    * @param {number} id - The unique identifier of the course.
    * @param {string} userId - The unique identifier of the user who owns the course.
-   * @returns {Promise<SelectCourse>} A promise that resolves to the course details.
+   * @returns {Promise<SelectCourse, SelectTask>} A promise that resolves to the course details.
    * @throws {AppException} If the course is not found (404).
    */
-  async getCourseById(id: number, userId: string): Promise<SelectCourse> {
+  async getCourseById(
+    id: number,
+    userId: string,
+  ): Promise<{ course: SelectCourse; tasks: SelectTask[] }> {
     logger.trace("Get course service");
 
     try {
-      const course = await this.repository.findById(id, userId);
+      const course = await this.courseRepository.findById(id, userId);
       logger.debug({ course }, "Course retrieved");
 
       if (!course)
@@ -72,7 +80,10 @@ export class CourseService {
           404,
         );
 
-      return course;
+      const tasks = await this.taskRepository.findByCourseId(id);
+      logger.debug({ tasks }, "Tasks retrieved");
+
+      return { course, tasks };
     } catch (error: any) {
       mapToAppException(error);
     }
@@ -89,7 +100,7 @@ export class CourseService {
     logger.trace("Create course service");
 
     try {
-      const result = await this.repository.create(course);
+      const result = await this.courseRepository.create(course);
       logger.debug({ result }, "Course created");
 
       return result;
@@ -123,7 +134,7 @@ export class CourseService {
     logger.trace("Update course service");
 
     try {
-      const result = await this.repository.updateById(id, course, userId);
+      const result = await this.courseRepository.updateById(id, course, userId);
       logger.debug({ result }, "Course updated");
 
       if (!result)
@@ -159,7 +170,7 @@ export class CourseService {
     logger.trace("Delete course service");
 
     try {
-      const affected = await this.repository.deleteById(id, userId);
+      const affected = await this.courseRepository.deleteById(id, userId);
       logger.debug({ affected }, "Course deleted");
 
       if (!affected)

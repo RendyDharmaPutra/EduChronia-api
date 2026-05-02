@@ -5,7 +5,7 @@ import { response } from "../../common/http/response";
 import { safeParseBody } from "../../common/http/validation/safe-parse-body";
 import { logger } from "../../common/lib/logger/pino";
 import { safeParsePaginationQuery } from "../../common/http/validation/safe-parse-query";
-import { getCourseParamSchema } from "./dto/get-course.dto";
+import { idParamSchema } from "../../common/http/validation/id.param";
 import { safeParseParams } from "../../common/http/validation/safe-parse-params";
 
 export class CourseController {
@@ -44,7 +44,7 @@ export class CourseController {
     logger.trace("Get course controller");
 
     const userId = c.get("userId");
-    const { id } = safeParseParams(c, getCourseParamSchema, "ID tidak valid");
+    const { id } = safeParseParams(c, idParamSchema, "ID tidak valid");
 
     const result = await this.service.getCourseById(id, userId);
 
@@ -88,7 +88,7 @@ export class CourseController {
     logger.trace("Update course controller");
 
     const userId = c.get("userId");
-    const { id } = safeParseParams(c, getCourseParamSchema, "ID tidak valid");
+    const { id } = safeParseParams(c, idParamSchema, "ID tidak valid");
     const body = await safeParseBody(
       c,
       updateCourseDto,
@@ -113,7 +113,7 @@ export class CourseController {
     logger.trace("Delete course controller");
 
     const userId = c.get("userId");
-    const { id } = safeParseParams(c, getCourseParamSchema, "ID tidak valid");
+    const { id } = safeParseParams(c, idParamSchema, "ID tidak valid");
 
     await this.service.deleteCourseById(id, userId);
 

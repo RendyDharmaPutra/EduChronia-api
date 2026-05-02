@@ -1,0 +1,17 @@
+import { Hono } from "hono";
+import type { TaskController } from "./task.controller";
+import { requireAuth } from "../../common/http/middleware/require-auth.middleware";
+
+export function taskRoutes(controller: TaskController) {
+  const router = new Hono();
+
+  router.use(requireAuth);
+
+  router.post("/", controller.create);
+  router.put("/:id", controller.update);
+  router.patch("/:id/complete", controller.setComplete);
+  router.patch("/:id/uncomplete", controller.setUnComplete);
+  router.delete("/:id", controller.delete);
+
+  return router;
+}
