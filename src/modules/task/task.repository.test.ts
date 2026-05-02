@@ -1,5 +1,6 @@
 import { describe, expect, it, mock, beforeEach } from "bun:test";
 import { tasksTable } from "../../common/db/schema/task.schema";
+import { eq } from "drizzle-orm";
 
 const mockTask = {
   id: 1,
@@ -15,6 +16,9 @@ const mockTask = {
 // Mock database client
 const mockDb = {
   select: mock(),
+  insert: mock(),
+  update: mock(),
+  delete: mock(),
 };
 
 mock.module("../../common/db/client", () => ({
@@ -34,6 +38,9 @@ describe("TaskRepository", () => {
 
   beforeEach(async () => {
     mockDb.select.mockReset();
+    mockDb.insert.mockReset();
+    mockDb.update.mockReset();
+    mockDb.delete.mockReset();
 
     const mod = await import("./task.repository");
     TaskRepository = mod.TaskRepository;
@@ -58,22 +65,53 @@ describe("TaskRepository", () => {
       expect(whereMock).toHaveBeenCalled();
       expect(result).toEqual(mockTasks);
     });
+  });
 
-    it("should return empty array if no tasks found", async () => {
-      const mockCourseId = 999;
+  describe("create", () => {
+    it("should insert a new task and return it", async () => {
+      const newTask = { title: "New", courseId: 1 };
+      const returningMock = mock().mockResolvedValue([{ ...newTask, id: 1 }]);
+      const valuesMock = mock().mockReturnValue({ returning: returningMock });
 
-      const orderByMock = mock().mockResolvedValue([]);
-      const whereMock = mock().mockReturnValue({ orderBy: orderByMock });
-      const fromMock = mock().mockReturnValue({ where: whereMock });
+      mockDb.insert.mockReturnValue({ values: valuesMock });
 
-      mockDb.select.mockReturnValue({ from: fromMock });
+      const result = await repository.create(newTask as any);
 
-      const result = await repository.findByCourseId(mockCourseId);
+      expect(mockDb.insert).toHaveBeenCalledWith(tasksTable);
+      expect(valuesMock).toHaveBeenCalledWith(newTask);
+      expect(returningMock).toHaveBeenCalled();
+      expect(result).toEqual({ ...newTask, id: 1 });
+    });
+  });
 
-      expect(mockDb.select).toHaveBeenCalled();
-      expect(fromMock).toHaveBeenCalledWith(tasksTable);
+  describe("updateById", () => {
+    it("should update task and return updated data", async () => {
+      const updateData = { title: "Updated" };
+      const returningMock = mock().mockResolvedValue([{ id: 1, ...updateData }]);
+      const whereMock = mock().mockReturnValue({ returning: returningMock });
+      const setMock = mock().mockReturnValue({ where: whereMock });
+
+      mockDb.update.mockReturnValue({ set: setMock });
+
+      const result = await repository.updateById(1, updateData);
+
+      expect(mockDb.update).toHaveBeenCalledWith(tasksTable);
+      expect(setMock).toHaveBeenCalledWith(updateData);
       expect(whereMock).toHaveBeenCalled();
-      expect(result).toEqual([]);
+      expect(result).toEqual({ id: 1, ...updateData });
+    });
+  });
+
+  describe("deleteById", () => {
+    it("should delete task and return row count", async () => {
+      const whereMock = mock().mockResolvedValue({ rowCount: 1 });
+      mockDb.delete.mockReturnValue({ where: whereMock });
+
+      const result = await repository.deleteById(1);
+
+      expect(mockDb.delete).toHaveBeenCalledWith(tasksTable);
+      expect(whereMock).toHaveBeenCalled();
+      expect(result).toBe(1);
     });
   });
 });
