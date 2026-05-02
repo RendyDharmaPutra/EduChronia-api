@@ -60,7 +60,7 @@ export class CourseService {
    *
    * @param {number} id - The unique identifier of the course.
    * @param {string} userId - The unique identifier of the user who owns the course.
-   * @returns {Promise<SelectCourse>} A promise that resolves to the course details.
+   * @returns {Promise<SelectCourse, SelectTask>} A promise that resolves to the course details.
    * @throws {AppException} If the course is not found (404).
    */
   async getCourseById(
