@@ -73,9 +73,6 @@ export class CourseController {
     const course = { ...body, userId };
     const result = await this.service.createCourse(course);
 
-    // ? audit log, do not remove
-    logger.info(`User (${userId}) created course [${result.name}]`);
-
     return response.success(c, result);
   };
 
@@ -98,9 +95,6 @@ export class CourseController {
     const course = { ...body, userId };
     const result = await this.service.updateCourseById(id, course, userId);
 
-    // ? audit log, do not remove
-    logger.info(`User (${userId}) updated course [${id}]`);
-
     return response.success(c, result);
   };
 
@@ -116,9 +110,6 @@ export class CourseController {
     const { id } = safeParseParams(c, idParamSchema, "ID tidak valid");
 
     await this.service.deleteCourseById(id, userId);
-
-    // ? audit log, do not remove
-    logger.info(`User (${userId}) deleted course [${id}]`);
 
     return response.success(c);
   };
