@@ -2,7 +2,10 @@ import { Context } from "hono";
 import z from "zod";
 import { ValidationException } from "../exception/validation.exception";
 import { logger } from "../../lib/logger/pino";
-import { PaginationQuery, paginationQuerySchema } from "./pagination.query";
+import {
+  PaginationQuery,
+  paginationQuerySchema,
+} from "./schemas/pagination.query";
 
 /**
  * Safely parses request query parameters using a Zod schema.

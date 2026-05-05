@@ -5,7 +5,7 @@ import { response } from "../../common/http/response";
 import { safeParseBody } from "../../common/http/validation/safe-parse-body";
 import { logger } from "../../common/lib/logger/pino";
 import { safeParsePaginationQuery } from "../../common/http/validation/safe-parse-query";
-import { idParamSchema } from "../../common/http/validation/id.param";
+import { idParamSchema } from "../../common/http/validation/schemas/id.param";
 import { safeParseParams } from "../../common/http/validation/safe-parse-params";
 
 export class CourseController {
