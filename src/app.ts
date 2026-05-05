@@ -36,7 +36,16 @@ export function createApp() {
   app.onError(errorHandler);
 
   app.get("/", async (c) => {
-    return response.success(c, { message: "Hello Hono!" });
+    return response.success(c, {
+      name: "EduChronia API",
+      version: env.APP_VERSION,
+    });
+  });
+  app.get("/health", (c) => {
+    return response.success(c, {
+      status: "ok",
+      version: env.APP_VERSION,
+    });
   });
 
   app.on(["POST", "GET"], "/auth/*", (c) => {
