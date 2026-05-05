@@ -31,6 +31,6 @@ export const httpLogger: MiddlewareHandler = async (c, next) => {
       status: c.res.status,
       duration,
     },
-    "Request Success",
+    "HTTP Request",
   );
 };
