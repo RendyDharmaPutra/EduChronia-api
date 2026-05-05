@@ -20,7 +20,7 @@ COPY --from=builder /app/bun.lock ./
 RUN bun install --production --frozen-lockfile
 
 EXPOSE 8000
-CMD ["bun", "dist/server.js"]
+CMD ["bun", "run", "start"]
 
 # Stage 3: Migration runner (needs drizzle-kit)
 FROM oven/bun:alpine AS migrator
@@ -35,4 +35,4 @@ COPY --from=builder /app/bun.lock ./
 
 RUN bun install --frozen-lockfile
 
-CMD ["bunx", "drizzle-kit", "migrate", "--config=drizzle.config.ts"]
+CMD ["bun", "run", "migrate"]
