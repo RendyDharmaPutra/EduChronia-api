@@ -12,7 +12,7 @@ export class TaskService {
 
   /**
    * Creates a new task and saves it to the database.
-   * 
+   *
    * @param {InsertTask} task - The task data to create.
    * @returns {Promise<SelectTask | void>} A promise that resolves to the created task.
    */
@@ -31,13 +31,16 @@ export class TaskService {
 
   /**
    * Updates an existing task by its ID.
-   * 
+   *
    * @param {number} id - The unique identifier of the task to update.
    * @param {UpdateTaskDto} task - The updated task data.
    * @returns {Promise<SelectTask | void>} A promise that resolves to the updated task.
    * @throws {AppException} If the task is not found (404).
    */
-  async updateTaskById(id: number, task: UpdateTaskDto): Promise<SelectTask | void> {
+  async updateTaskById(
+    id: number,
+    task: UpdateTaskDto,
+  ): Promise<SelectTask | void> {
     logger.trace("Update task service");
 
     try {
@@ -45,7 +48,7 @@ export class TaskService {
       logger.debug({ result }, "Task Updated");
 
       if (!result)
-        throw new AppException(`Task tidak ditemukan`, "TASK_NOT_FOUND", 404);
+        throw new AppException(`Tugas tidak ditemukan`, "TASK_NOT_FOUND", 404);
 
       return result;
     } catch (error: any) {
@@ -55,7 +58,7 @@ export class TaskService {
 
   /**
    * Deletes a task by its ID.
-   * 
+   *
    * @param {number} id - The unique identifier of the task to delete.
    * @returns {Promise<number | void>} A promise that resolves to the number of deleted rows.
    * @throws {AppException} If the task is not found (404).
@@ -78,13 +81,16 @@ export class TaskService {
 
   /**
    * Updates the completion status of a task.
-   * 
+   *
    * @param {number} id - The unique identifier of the task.
    * @param {boolean} status - The new completion status (true for complete, false for incomplete).
    * @returns {Promise<SelectTask | void>} A promise that resolves to the updated task.
    * @throws {AppException} If the task is not found (404).
    */
-  async setCompleteById(id: number, status: boolean): Promise<SelectTask | void> {
+  async setCompleteById(
+    id: number,
+    status: boolean,
+  ): Promise<SelectTask | void> {
     logger.trace("Set complete task service");
 
     try {
