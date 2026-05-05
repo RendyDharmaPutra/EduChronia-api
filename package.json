@@ -1,8 +1,9 @@
 {
-  "name": "EduChronia-api",
   "version": "1.0.0",
+  "name": "EduChronia-api",
   "description": "Backend service for EduChronia",
   "author": "Archilst",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "bun run --hot src/main.ts",
