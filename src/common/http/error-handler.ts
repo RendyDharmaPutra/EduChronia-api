@@ -17,7 +17,21 @@ export const errorHandler = async (err: Error, c: Context) => {
   const reqId = c.get("requestId");
 
   logger.error(
-    `[rid=${reqId}] ${err.message} (${c.req.method} ${c.req.path} ${c.res.status})`,
+    {
+      reqId,
+      localTime: new Date().toLocaleString("id-ID", {
+        timeZone: "Asia/Jakarta",
+      }),
+      method: c.req.method,
+      path: c.req.path,
+      status: c.res.status,
+      error: {
+        message: err.message,
+        type: (err as any).type,
+        stack: err.stack,
+      },
+    },
+    "Request Error",
   );
 
   switch (true) {

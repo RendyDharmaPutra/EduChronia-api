@@ -14,13 +14,23 @@ export const httpLogger: MiddlewareHandler = async (c, next) => {
   const reqId = c.get("requestId");
 
   // Get the start time of the request
-  const start = Date.now();
+  const startTime = Date.now();
   // Call the next middleware function
   await next();
   // Calculate the response time
-  const ms = Date.now() - start;
+  const duration = Date.now() - startTime;
 
   logger.info(
-    `[rid=${reqId}] ${c.req.method} ${c.req.path} ${c.res.status} ${ms}ms`,
+    {
+      reqId,
+      localTime: new Date().toLocaleString("id-ID", {
+        timeZone: "Asia/Jakarta",
+      }),
+      method: c.req.method,
+      path: c.req.path,
+      status: c.res.status,
+      duration,
+    },
+    "Request Success",
   );
 };
