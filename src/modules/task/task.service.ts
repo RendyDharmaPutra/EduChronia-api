@@ -87,11 +87,11 @@ export class TaskService {
    * @returns {Promise<SelectTask | void>} A promise that resolves to the updated task.
    * @throws {AppException} If the task is not found (404).
    */
-  async setCompleteById(
+  async toggleCompletionById(
     id: number,
     status: boolean,
   ): Promise<SelectTask | void> {
-    logger.trace("Set complete task service");
+    logger.trace("Toggle completion task service");
 
     try {
       const result = await this.repository.updateById(id, {

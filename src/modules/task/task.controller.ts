@@ -85,7 +85,7 @@ export class TaskController {
 
     const { id } = safeParseParams(c, idParamSchema, "ID tidak valid");
 
-    const result = await this.service.setCompleteById(id, true);
+    const result = await this.service.toggleCompletionById(id, true);
 
     return response.success(c, result);
   };
@@ -101,7 +101,7 @@ export class TaskController {
 
     const { id } = safeParseParams(c, idParamSchema, "ID tidak valid");
 
-    const result = await this.service.setCompleteById(id, false);
+    const result = await this.service.toggleCompletionById(id, false);
 
     return response.success(c, result);
   };
