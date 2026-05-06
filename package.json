@@ -1,7 +1,15 @@
 {
+  "version": "1.0.0",
   "name": "EduChronia-api",
+  "description": "Backend service for EduChronia",
+  "author": "Archilst",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "bun run --hot src/main.ts"
+    "dev": "bun run --hot src/main.ts",
+    "build": "bun build src/main.ts --outdir dist --target=bun",
+    "start": "bun dist/main.js",
+    "migrate": "bunx drizzle-kit migrate --config=./drizzle.config.ts"
   },
   "dependencies": {
     "better-auth": "^1.4.17",

@@ -18,7 +18,7 @@ export class CourseRepository {
     page: number,
     limit: number,
   ): Promise<SelectCourse[]> {
-    logger.trace("Find all by user repository");
+    logger.trace("Find all courses by user repository");
 
     const result = await db
       .select()
@@ -39,7 +39,7 @@ export class CourseRepository {
    * @returns {Promise<SelectCourse | null>} A promise that resolves to the course if found, or null otherwise.
    */
   async findById(id: number, userId: string): Promise<SelectCourse | null> {
-    logger.trace("Find by id repository");
+    logger.trace("Find course by id repository");
 
     const result = await db
       .select()
@@ -56,7 +56,7 @@ export class CourseRepository {
    * @returns {Promise<number>} A promise that resolves to the total count of courses.
    */
   async countByUser(userId: string): Promise<number> {
-    logger.trace("Count by user repository");
+    logger.trace("Count courses by user repository");
 
     const result = await db
       .select({ count: count(coursesTable.id) })
@@ -73,7 +73,7 @@ export class CourseRepository {
    * @returns {Promise<SelectCourse>} A promise that resolves to the newly created course.
    */
   async create(course: InsertCourse): Promise<SelectCourse> {
-    logger.trace("Create repository");
+    logger.trace("Create course repository");
 
     const result = await db.insert(coursesTable).values(course).returning();
 
@@ -93,7 +93,7 @@ export class CourseRepository {
     course: InsertCourse,
     userId: string,
   ): Promise<SelectCourse> {
-    logger.trace("Update by id repository");
+    logger.trace("Update course by id repository");
 
     const result = await db
       .update(coursesTable)
@@ -112,7 +112,7 @@ export class CourseRepository {
    * @returns {Promise<number | null>} A promise that resolves to the number of affected rows.
    */
   async deleteById(id: number, userId: string): Promise<number | null> {
-    logger.trace("Delete by id repository");
+    logger.trace("Delete course by id repository");
 
     const result = await db
       .delete(coursesTable)

@@ -5,7 +5,7 @@ import { logger } from "../../common/lib/logger/pino";
 import { safeParseBody } from "../../common/http/validation/safe-parse-body";
 import { createTaskDto } from "./dto/task.dto";
 import { safeParseParams } from "../../common/http/validation/safe-parse-params";
-import { idParamSchema } from "../../common/http/validation/id.param";
+import { idParamSchema } from "../../common/http/validation/schemas/id.param";
 
 /**
  * Controller handling HTTP requests related to tasks.
@@ -15,7 +15,7 @@ export class TaskController {
 
   /**
    * Handles the creation of a new task.
-   * 
+   *
    * @param {Context} c - The Hono request context.
    * @returns {Promise<Response>} The HTTP response containing the created task.
    */
@@ -37,7 +37,7 @@ export class TaskController {
 
   /**
    * Handles updating an existing task by its ID.
-   * 
+   *
    * @param {Context} c - The Hono request context.
    * @returns {Promise<Response>} The HTTP response containing the updated task.
    */
@@ -60,7 +60,7 @@ export class TaskController {
 
   /**
    * Handles the deletion of a task by its ID.
-   * 
+   *
    * @param {Context} c - The Hono request context.
    * @returns {Promise<Response>} The HTTP response indicating success.
    */
@@ -76,7 +76,7 @@ export class TaskController {
 
   /**
    * Marks a specific task as completed.
-   * 
+   *
    * @param {Context} c - The Hono request context.
    * @returns {Promise<Response>} The HTTP response containing the updated task.
    */
@@ -85,14 +85,14 @@ export class TaskController {
 
     const { id } = safeParseParams(c, idParamSchema, "ID tidak valid");
 
-    const result = await this.service.setCompleteById(id, true);
+    const result = await this.service.toggleCompletionById(id, true);
 
     return response.success(c, result);
   };
 
   /**
    * Marks a specific task as uncompleted.
-   * 
+   *
    * @param {Context} c - The Hono request context.
    * @returns {Promise<Response>} The HTTP response containing the updated task.
    */
@@ -101,7 +101,7 @@ export class TaskController {
 
     const { id } = safeParseParams(c, idParamSchema, "ID tidak valid");
 
-    const result = await this.service.setCompleteById(id, false);
+    const result = await this.service.toggleCompletionById(id, false);
 
     return response.success(c, result);
   };

@@ -5,7 +5,7 @@ import { response } from "../../common/http/response";
 import { safeParseBody } from "../../common/http/validation/safe-parse-body";
 import { logger } from "../../common/lib/logger/pino";
 import { safeParsePaginationQuery } from "../../common/http/validation/safe-parse-query";
-import { idParamSchema } from "../../common/http/validation/id.param";
+import { idParamSchema } from "../../common/http/validation/schemas/id.param";
 import { safeParseParams } from "../../common/http/validation/safe-parse-params";
 
 export class CourseController {
@@ -73,9 +73,6 @@ export class CourseController {
     const course = { ...body, userId };
     const result = await this.service.createCourse(course);
 
-    // ? audit log, do not remove
-    logger.info(`User (${userId}) created course [${result.name}]`);
-
     return response.success(c, result);
   };
 
@@ -98,9 +95,6 @@ export class CourseController {
     const course = { ...body, userId };
     const result = await this.service.updateCourseById(id, course, userId);
 
-    // ? audit log, do not remove
-    logger.info(`User (${userId}) updated course [${id}]`);
-
     return response.success(c, result);
   };
 
@@ -116,9 +110,6 @@ export class CourseController {
     const { id } = safeParseParams(c, idParamSchema, "ID tidak valid");
 
     await this.service.deleteCourseById(id, userId);
-
-    // ? audit log, do not remove
-    logger.info(`User (${userId}) deleted course [${id}]`);
 
     return response.success(c);
   };

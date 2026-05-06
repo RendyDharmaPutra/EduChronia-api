@@ -13,6 +13,10 @@ export const logger = pino({
   base: {
     service: "educhronia-api",
   },
+  timestamp: pino.stdTimeFunctions.isoTime,
+  formatters: {
+    level: (label) => ({ level: label }),
+  },
   transport:
     env.NODE_ENV === "development"
       ? {
