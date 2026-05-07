@@ -2,6 +2,7 @@
 # Stage 1: Build
 FROM oven/bun:alpine AS builder
 WORKDIR /app
+ENV NODE_ENV=production
 
 COPY bun.lock package.json ./
 RUN bun install --frozen-lockfile
@@ -19,7 +20,6 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/bun.lock ./
 RUN bun install --production --frozen-lockfile
 
-EXPOSE 8000
 CMD ["bun", "run", "start"]
 
 # Stage 3: Migration runner (needs drizzle-kit)

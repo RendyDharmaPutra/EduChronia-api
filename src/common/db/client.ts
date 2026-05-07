@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+import { env } from "../config/env";
 
 /**
  * The database connection pool.
@@ -19,5 +20,5 @@ const pool = new Pool({
  */
 export const db = drizzle(pool, {
   // Enable logging of SQL queries if the environment is in development mode.
-  logger: process.env.NODE_ENV === "development",
+  logger: env.NODE_ENV === "development",
 });
